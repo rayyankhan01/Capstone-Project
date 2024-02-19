@@ -6,8 +6,6 @@ def image_to_map_id(ee_object, vis_params={}):
         # Load a feature collection and filter it to the UAE
         countries = ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
         uae = countries.filter(ee.Filter.eq('country_na', 'United Arab Emirates'))
-
-        # Reduce the collection to a single feature, since the UAE will have only one entry
         uae_boundaries = uae.first().geometry()
 
         # Check if the object is an ImageCollection
