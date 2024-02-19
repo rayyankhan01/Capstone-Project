@@ -53,6 +53,10 @@ header {
   margin-top: 5px;
   margin-bottom: 5px;
 }
+#legend-min, #legend-max {
+  color: #000;
+}
+
 
 
 /* Footer Styles */

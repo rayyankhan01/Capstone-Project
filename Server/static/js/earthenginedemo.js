@@ -15,6 +15,41 @@ $(function () {
   });
 });
 
+const gasVizParams = {
+  "SO2":{
+    min: 0.0,
+    max: 0.0005,
+    palette: ['black', 'blue', 'purple', 'cyan', 'green', 'yellow', 'red']
+  },
+    "NO2":{
+    min: 0.0,
+    max: 0.0002,
+    palette: ['purple', 'blue', 'green', 'yellow', 'red']
+  },
+    "CO":{
+    min: 0.0,
+    max: 0.05,
+    palette: ['black', 'blue', 'green', 'yellow', 'red']
+  },
+    "HCHO":{
+    min: 0.0,
+    max: 0.0001,
+    palette: ['black', 'blue', 'green', 'yellow', 'red']
+  },
+    "O3":{
+    min: 0.0,
+    max: 0.0003,
+    palette: ['black', 'blue', 'green', 'yellow', 'red']
+  },
+    "CH4":{
+    min: 1750,
+    max: 1900,
+    palette: ['black', 'blue', 'green', 'yellow', 'red']
+  },
+  };
+
+
+
 function test(selectedGas) {
   $.ajax({
     url: api_url + "test",
@@ -26,13 +61,14 @@ function test(selectedGas) {
         map.removeLayer(currentLayer); // Remove the existing layer
       }
       currentLayer = addMapLayer(data.url); // Add the new layer and keep track of it
+      const vizParams = gasVizParams[selectedGas];
+      updateLegend(vizParams.min, vizParams.max, vizParams.palette);
     },
     error: function(jqXHR, textStatus, errorThrown) {
       console.error('Error fetching data:', textStatus, errorThrown);
     }
   });
 }
-
 function addMapLayer(url) {
   const newLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
