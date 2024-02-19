@@ -3,17 +3,59 @@
 <head>
     <meta charset="utf-8" />
     <title>Earth Engine Demo</title>
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/earthenginedemo.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/earthenginedemo.css') }}" />
 
-    <script src="https://code.jquery.com/jquery-3.6.0.js"
-            integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
-            crossorigin="anonymous"></script>
+    <!-- Load libraries for the map -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js"></script>
+
+    <!-- Load custom scripts -->
     <script src="{{ url_for('static', filename='js/map_utils.js') }}"></script>
     <script src="{{ url_for('static', filename='js/earthenginedemo.js') }}"></script>
 </head>
 <body>
-    <div id="map"></div>
+    <!-- Navigation bar -->
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+        </ul>
+    </nav>
+
+    <!-- Title or Header -->
+    <header>
+        <h1>Environmental Data Map</h1>
+    </header>
+
+    <!-- Add a dropdown for gas selection above the map container -->
+<select id="gas-select">
+  <option value="SO2">Sulphur Dioxide</option>
+  <option value="NO2">Nitrogen Dioxide</option>
+  <option value="CO">Carbon Monoxide</option>
+  <option value="HCHO">Formaldehyde</option>
+  <option value="O3">Ozone</option>
+  <option value="CH4">Methane</option>
+</select>
+
+    <!-- Map Container -->
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+
+    <!-- Add this inside your <body> tag -->
+<div id="legend" style="position: absolute; bottom: 10px; right: 10px; padding: 10px; background: white; z-index: 100;">
+  <div id="legend-title">Gas Concentration</div>
+  <canvas id="legend-canvas" width="300" height="50"></canvas>
+  <div id="legend-min-max">
+    <span id="legend-min">Min</span>
+    <span id="legend-max" style="float: right;">Max</span>
+  </div>
+</div>
+
+
+    <!-- Other content like footer or additional information -->
+    <footer>
+        <p>Footer content goes here</p>
+    </footer>
 </body>
 </html>
