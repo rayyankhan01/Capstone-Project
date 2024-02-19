@@ -13,6 +13,38 @@ def index():
     return render_template('index.html')
 
 
+
+@app.route('/get-no2-image', methods=['GET'])
+def get_no2_image():
+    try:
+        # Define your Earth Engine code here
+        collection = ee.ImageCollection("COPERNICUS/S5P/NRTI/L3_NO2")\
+            .filterDate('2018-07-10', '2018-08-10')\
+            .select('NO2_column_number_density')
+
+        countries = ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
+        uae = countries.filter(ee.Filter.eq('country_na', 'United Arab Emirates'))
+
+        # Create a composite image, e.g., a median composite
+        composite = collection.median()
+
+        # Define visualization parameters
+        viz_params = {
+            'min': 0,
+            'max': 0.0002,
+            'palette': ['blue', 'green', 'yellow', 'red']
+        }
+
+        # Get the URL for the composite image visualization
+        url = composite.clip(uae).getMapId(viz_params)['tile_fetcher'].url_format
+
+        return jsonify({'url': url})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 @app.route('/test', methods=['POST'])
 def test():
     # Parse the selected gas from the request

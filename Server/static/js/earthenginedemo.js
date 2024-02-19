@@ -98,5 +98,22 @@ function updateLegend(minValue, maxValue, palette) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
+function fetchAndDisplayNO2Image() {
+  $.ajax({
+    url: api_url + 'get-no2-image',
+    type: 'GET',
+    success: function(response) {
+      var imageUrl = response.url;
+      document.getElementById('ee-image').src = imageUrl; // Update the image src
+    },
+    error: function(error) {
+      console.error("Error fetching NO2 image:", error);
+      document.getElementById('ee-image').alt = "Error loading image";
+    }
+  });
+}
+
+fetchAndDisplayNO2Image();
+
 
 
