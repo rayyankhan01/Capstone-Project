@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask import request, jsonify
 from flask_cors import CORS
 from ee_utils import *
@@ -9,8 +9,8 @@ CORS(app)
 ee.Initialize()
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def index():
+    return render_template('index.html')
 
 
 @app.route('/test', methods=['GET', 'POST'])
