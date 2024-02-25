@@ -61,11 +61,18 @@ header {
 
 /* Footer Styles */
 footer {
-    background-color: #333;
+    background-color: #494939;
     color: white;
     text-align: center;
     padding: 10px;
     position: relative;
     bottom: 0;
     width: 100%;
+}
+
+#no2-chart {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    margin: auto;
 }

@@ -13,36 +13,45 @@ def index():
     return render_template('index.html')
 
 
-
-@app.route('/get-no2-image', methods=['GET'])
-def get_no2_image():
+@app.route('/get-no2-timeseries', methods=['GET'])
+def get_no2_timeseries():
     try:
-        # Define your Earth Engine code here
-        collection = ee.ImageCollection("COPERNICUS/S5P/NRTI/L3_NO2")\
+        Sent5PNO2 = ee.ImageCollection("COPERNICUS/S5P/NRTI/L3_NO2")\
             .filterDate('2018-07-10', '2018-08-10')\
             .select('NO2_column_number_density')
 
         countries = ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
         uae = countries.filter(ee.Filter.eq('country_na', 'United Arab Emirates'))
+        uae_geometry = uae.first().geometry()  # Assuming UAE is a single feature
 
-        # Create a composite image, e.g., a median composite
-        composite = collection.median()
+        def reduce_region(image):
+            stat = image.reduceRegion(
+                reducer=ee.Reducer.median(),
+                geometry=uae_geometry,
+                scale=24500  # Increase the scale to reduce memory usage
+            )
+            return ee.Feature(None, {
+                'median_no2': stat.get('NO2_column_number_density'),
+                'date': image.date().format()
+            })
 
-        # Define visualization parameters
-        viz_params = {
-            'min': 0,
-            'max': 0.0002,
-            'palette': ['blue', 'green', 'yellow', 'red']
-        }
+        # Apply the function to each image in the collection.
+        timeseries_data = Sent5PNO2.map(reduce_region)
 
-        # Get the URL for the composite image visualization
-        url = composite.clip(uae).getMapId(viz_params)['tile_fetcher'].url_format
+        # Fetch the data from Earth Engine
+        processed_data = timeseries_data.getInfo()
 
-        return jsonify({'url': url})
+        # Process the data for the response
+        dates = [d['properties']['date'] for d in processed_data['features']]
+        values = [v['properties']['median_no2'] for v in processed_data['features']]
+
+        return jsonify({'dates': dates, 'values': values})
+
+
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+        print(e)  # Print the error for debugging
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/test', methods=['POST'])
