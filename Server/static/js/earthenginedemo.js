@@ -98,22 +98,41 @@ function updateLegend(minValue, maxValue, palette) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function fetchAndDisplayNO2Image() {
-  $.ajax({
-    url: api_url + 'get-no2-image',
-    type: 'GET',
-    success: function(response) {
-      var imageUrl = response.url;
-      document.getElementById('ee-image').src = imageUrl; // Update the image src
-    },
-    error: function(error) {
-      console.error("Error fetching NO2 image:", error);
-      document.getElementById('ee-image').alt = "Error loading image";
-    }
-  });
+// JavaScript to fetch the data and display the chart
+// Function to fetch and display the NO2 chart
+function fetchAndDisplayNO2Chart() {
+    fetch('/get-no2-timeseries')
+        .then(response => response.json())
+        .then(data => {
+            // Create the chart using the data
+            const ctx = document.getElementById('no2-chart').getContext('2d');
+            const no2Chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.dates, // Array of dates
+                    datasets: [{
+                        label: 'Median NO2 Concentration',
+                        data: data.values, // Array of median NO2 values
+                        backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                        borderColor: 'rgba(0, 123, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error:', error));
 }
 
-fetchAndDisplayNO2Image();
-
+// Call this function when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    fetchAndDisplayNO2Chart();
+});
 
 

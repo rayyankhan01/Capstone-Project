@@ -8,6 +8,7 @@
     <!-- Load libraries for the map -->
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Load custom scripts -->
     <script src="{{ url_for('static', filename='js/map_utils.js') }}"></script>
@@ -56,9 +57,7 @@
     <!-- Other content like footer or additional information -->
     <footer>
         <p>Footer content goes here</p>
-        <div id ="ee-image-container">
-            <img id="ee-image" src="" alt="Earth Engine Data" style="max-width: 100%; height: auto;">
-        </div>
+        <canvas id="no2-chart"></canvas> <!-- Canvas for Chart.js chart -->
     </footer>
 </body>
 </html>
