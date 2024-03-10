@@ -1,5 +1,6 @@
 let currentLayer;
 
+
 $(function () {
   // Initial map load
   loadMap("map", ol.proj.transform([54.0000, 24.0000], 'EPSG:4326', 'EPSG:3857'), 7);
@@ -100,39 +101,55 @@ function updateLegend(minValue, maxValue, palette) {
 
 // JavaScript to fetch the data and display the chart
 // Function to fetch and display the NO2 chart
-function fetchAndDisplayNO2Chart() {
-    fetch('/get-no2-timeseries')
-        .then(response => response.json())
-        .then(data => {
-            // Create the chart using the data
-            const ctx = document.getElementById('no2-chart').getContext('2d');
-            const no2Chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.dates, // Array of dates
-                    datasets: [{
-                        label: 'Median NO2 Concentration',
-                        data: data.values, // Array of median NO2 values
-                        backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                        borderColor: 'rgba(0, 123, 255, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        })
-        .catch(error => console.error('Error:', error));
-}
+// function fetchAndDisplayNO2TimeSeries() {
+//     fetch('/api/get-no2-timeseries') // Adjust this endpoint as necessary
+//     .then(response => response.json())
+//     .then(data => {
+//         const labels = data.map(item => item.date);
+//         const no2Values = data.map(item => item.mean_no2);
+//
+//         const ctx = document.getElementById('no2-chart').getContext('2d');
+//         new Chart(ctx, {
+//             type: 'line',
+//             data: {
+//                 labels: labels,  // x-axis labels (dates)
+//                 datasets: [{
+//                     label: 'Daily Mean NO2 Concentration',
+//                     data: no2Values,  // y-axis values
+//                     borderColor: 'rgb(75, 192, 192)',
+//                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
+//                     fill: false,
+//                     tension: 0.1
+//                 }]
+//             },
+//             options: {
+//                 scales: {
+//                     y: {
+//                         beginAtZero: false,  // Depending on NO2 values, adjust this
+//                         title: {
+//                             display: true,
+//                             text: 'NO2 Concentration'
+//                         }
+//                     },
+//                     x: {
+//                         title: {
+//                             display: true,
+//                             text: 'Date'
+//                         }
+//                     }
+//                 }
+//             }
+//         });
+//     })
+//     .catch(error => console.error('Error:', error));
+// }
+//
+// // Ensure you call this function when the document is ready
+// document.addEventListener('DOMContentLoaded', function() {
+//     fetchAndDisplayNO2TimeSeries();
+// });
 
-// Call this function when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    fetchAndDisplayNO2Chart();
-});
+
+
 
 
