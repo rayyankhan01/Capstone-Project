@@ -1,10 +1,9 @@
 /* Navigation Bar Styles */
 nav ul {
-    list-style-type: none;
+    list-style-type: none; 
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #333;
 }
 
 nav ul li {
@@ -19,9 +18,9 @@ nav ul li a {
     text-decoration: none;
 }
 
-nav ul li a:hover {
+/* nav ul li a:hover {
     background-color: #111;
-}
+} */
 
 /* Header Styles */
 header {
