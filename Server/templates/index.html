@@ -39,35 +39,111 @@
     </header> -->
 
     <!-- Add a dropdown for gas selection above the map container -->
-<select id="gas-select">
-  <option value="SO2">Sulphur Dioxide</option>
-  <option value="NO2">Nitrogen Dioxide</option>
-  <option value="CO">Carbon Monoxide</option>
-  <option value="HCHO">Formaldehyde</option>
-  <option value="O3">Ozone</option>
-  <option value="CH4">Methane</option>
-</select>
+    <!-- The selection bars -->
 
-    <!-- Map Container -->
-    <div id="map-container">
-        <div id="map"></div>
+    <ul class="nav justify-content-center">
+      <li class="nav-item">
+        <select class="form-select" id="gas-select">
+          <option value="SO2">Sulphur Dioxide</option>
+          <option value="NO2">Nitrogen Dioxide</option>
+          <option value="CO">Carbon Monoxide</option>
+          <option value="HCHO">Formaldehyde</option>
+          <option value="O3">Ozone</option>
+          <option value="CH4">Methane</option>
+        </select>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+      </li>
+    </ul>
+
+        <!-- Map Container -->
+        <div id="map-container">
+            <div id="map"></div>
+        </div>
+
+        <!-- Add this inside your <body> tag -->
+    <div id="legend" style="position: absolute; bottom: 10px; right: 10px; padding: 10px; background: white; z-index: 100;">
+      <div id="legend-title">Gas Concentration</div>
+      <canvas id="legend-canvas" width="300" height="50"></canvas>
+      <div id="legend-min-max">
+        <span id="legend-min">Min</span>
+        <span id="legend-max" style="float: right;">Max</span>
+      </div>
     </div>
 
-    <!-- Add this inside your <body> tag -->
-<div id="legend" style="position: absolute; bottom: 10px; right: 10px; padding: 10px; background: white; z-index: 100;">
-  <div id="legend-title">Gas Concentration</div>
-  <canvas id="legend-canvas" width="300" height="50"></canvas>
-  <div id="legend-min-max">
-    <span id="legend-min">Min</span>
-    <span id="legend-max" style="float: right;">Max</span>
-  </div>
-</div>
+    <!-- The charts and description cards -->
+    <div class="container">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        <div class="col">
+          <div class="card shadow-sm">
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Put chart image here</text></svg>
+            <div class="card-body">
+              <p class="card-text">This is the explanation part</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-body-secondary">Reference here maybe</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Put chart image here</text></svg>
+            <div class="card-body">
+              <p class="card-text">This is the explanation part</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-body-secondary">Reference here maybe</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Put chart image here</text></svg>
+            <div class="card-body">
+              <p class="card-text">This is the explanation part</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-body-secondary">Reference here maybe</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Put chart image here</text></svg>
+            <div class="card-body">
+              <p class="card-text">This is the explanation part</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-body-secondary">Reference here maybe</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Put chart image here</text></svg>
+            <div class="card-body">
+              <p class="card-text">This is the explanation part</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-body-secondary">Reference here maybe</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<footer>
-    <p>Footer content goes here</p>
-   <iframe src="https://ee-b00087899.projects.earthengine.app/view/test" width="600" height="400"></iframe>
-</footer>
-<canvas id="no2-chart"></canvas>
+    <footer>
+        <p>Footer content goes here</p>
+      <iframe src="https://ee-b00087899.projects.earthengine.app/view/test" width="600" height="400"></iframe>
+    </footer>
+    <canvas id="no2-chart"></canvas>
 
 <!-- Bootstrap script -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
