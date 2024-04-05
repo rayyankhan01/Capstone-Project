@@ -20,46 +20,14 @@ import ee
 
 ee.Initialize()
 
-# @app.route('/api/get-no2-timeseries')
-# def get_no2_timeseries():
-#     Sent5PNO2 = ee.ImageCollection("COPERNICUS/S5P/NRTI/L3_NO2") \
-#         .filterDate('2023-12-01', '2023-12-03') \
-#         .select('NO2_column_number_density')
-#
-#     countries = ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
-#     uae = countries.filter(ee.Filter.eq('country_na', 'United Arab Emirates')).geometry()
-#
-#     def daily_mean(image):
-#         mean = image.reduceRegion(
-#             reducer=ee.Reducer.mean(),
-#             geometry=uae,
-#             scale=1000
-#         )
-#         date = ee.Date(image.get('system:time_start'))
-#         return ee.Feature(None, {'date': date.format('YYYY-MM-dd'), 'mean_no2': mean.get('NO2_column_number_density')})
-#
-#
-#
-#     # Map the function over the ImageCollection
-#     daily_means = Sent5PNO2.map(daily_mean)
-#
-#     # Now, outside of the mapped function, we can bring the processed data client-side
-#     try:
-#         info = daily_means.getInfo()  # This is where you retrieve the data client-side
-#         processed_data = [
-#             {'date': feature['properties']['date'], 'mean_no2': feature['properties']['mean_no2']}
-#             for feature in info['features'] if feature['properties']['mean_no2'] is not None
-#         ]
-#         print(processed_data)
-#     except Exception as e:
-#         traceback.print_exc()
-#         return jsonify({'error': str(e)}), 500
-
 @app.route('/test', methods=['POST'])
 def test():
-    # Parse the selected gas from the request
+
     request_data = request.get_json()
+    print(request_data);
     selected_gas = request_data['gas']
+    start_date = request_data['startDate']
+    end_date = request_data['endDate']
 
     # Dictionary to map gases to their corresponding image collection IDs
     gas_to_collection = {
@@ -92,6 +60,8 @@ def test():
     collection_id = gas_to_collection[selected_gas]
     band_viz = gas_viz_params[selected_gas]
 
+    print("Start Date:", start_date, "End Date:", end_date)
+
     # Fetch the collection and filter for the UAE
     countries = ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
     uae = countries.filter(ee.Filter.eq('country_na', 'United Arab Emirates'))
@@ -99,12 +69,14 @@ def test():
 
     collection = ee.ImageCollection(collection_id) \
         .select(band_viz['bands']) \
-        .filterDate('2023-12-01', '2024-01-01') \
+        .filterDate(start_date, end_date) \
         .mean() \
         .clip(uae_boundaries)
 
     url = image_to_map_id(collection, band_viz)
     return jsonify(url), 200
+
+
 
 
 if __name__ == '__main__':

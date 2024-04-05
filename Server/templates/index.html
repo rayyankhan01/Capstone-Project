@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <meta charset="utf-8" />
     <title>Earth Engine Demo</title>
     <link rel="stylesheet" href="../static/css/earthenginedemo.css" />
@@ -9,7 +13,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <!-- Load libraries for the map -->
-    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -33,13 +36,6 @@
         </div>
     </nav>
 
-    <!-- Title or Header -->
-    <!-- <header>
-        <h1>Environmental Data Map</h1>
-    </header> -->
-
-    <!-- Add a dropdown for gas selection above the map container -->
-    <!-- The selection bars -->
 
     <ul class="nav justify-content-center">
       <li class="nav-item">
@@ -77,6 +73,11 @@
         <span id="legend-max" style="float: right;">Max</span>
       </div>
     </div>
+    <label for="start-date">Start Date:</label>
+    <input type="text" id="start-date" name="start-date">
+    <label for="end-date">End Date:</label>
+    <input type="text" id="end-date" name="end-date">
+    <button id="refresh-layer">Refresh</button>
 
     <!-- The charts and description cards -->
     <div class="container">
@@ -139,6 +140,7 @@
       </div>
     </div>
 
+
     <footer>
         <p>Footer content goes here</p>
       <iframe src="https://ee-b00087899.projects.earthengine.app/view/test" width="600" height="400"></iframe>
@@ -147,5 +149,16 @@
 
 <!-- Bootstrap script -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+$(document).ready(function() {
+    $("#start-date").datepicker({
+        dateFormat: "yy-mm-dd"
+    });
+    $("#end-date").datepicker({
+        dateFormat: "yy-mm-dd"
+    });
+});
+</script>
+
 </body>
 </html>
