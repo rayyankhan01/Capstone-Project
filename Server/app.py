@@ -9,7 +9,25 @@ app = Flask(__name__)
 CORS(app)
 ee.Initialize()
 
+@app.route('/gas-info', methods=['POST'])
+def gas_info():
+    request_data = request.get_json()
+    latitude = request_data['latitude']
+    longitude = request_data['longitude']
 
+    # Placeholder for Earth Engine query logic to retrieve gas information
+    # This is where you would use the EE API to query gas emissions data at the given coordinates
+    # As an example, let's return mock data
+    gas_data = {
+        "SO2": "0.02 units",
+        "NO2": "0.04 units",
+        "CO": "0.03 units",
+        "HCHO": "0.01 units",
+        "O3": "0.05 units",
+        "CH4": "0.06 units"
+    }
+
+    return jsonify(gas_data)
 @app.route('/')
 def index():
     return render_template('index.html')

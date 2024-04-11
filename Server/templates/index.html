@@ -63,6 +63,16 @@
         <div id="map-container">
             <div id="map"></div>
         </div>
+   <div class="offcanvas offcanvas-end" tabindex="-1" id="gasInfoOffcanvas" aria-labelledby="gasInfoOffcanvasLabel">
+      <div class="offcanvas-header">
+        <h5 id="gasInfoOffcanvasLabel">Gas Information</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <p>Click on the map to see gas emissions at that point.</p>
+        <div id="gasEmissionsInfo"></div>
+      </div>
+    </div>
 
         <!-- Add this inside your <body> tag -->
     <div id="legend" style="position: absolute; bottom: 10px; right: 10px; padding: 10px; background: white; z-index: 100;">
@@ -148,7 +158,6 @@
     <canvas id="no2-chart"></canvas>
 
 <!-- Bootstrap script -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
 $(document).ready(function() {
     $("#start-date").datepicker({
@@ -158,7 +167,9 @@ $(document).ready(function() {
         dateFormat: "yy-mm-dd"
     });
 });
+
 </script>
 
+<script src="../static/js/map_click_handler.js"></script>
 </body>
 </html>
