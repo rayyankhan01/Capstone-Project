@@ -1,14 +1,20 @@
 // Ensure this code runs after the map object has been initialized
 document.addEventListener("DOMContentLoaded", function() {
     // Assuming 'map' is the variable holding your OpenLayers map instance
-    window.map.on('singleclick', function(evt) {
-        const coordinate = ol.proj.toLonLat(evt.coordinate);
-        const lon = coordinate[0];
-        const lat = coordinate[1];
+   window.onload = function() {
+    if (window.map && window.map.on) {
+        window.map.on('singleclick', function(evt) {
+            const coordinate = ol.proj.toLonLat(evt.coordinate);
+            const lon = coordinate[0];
+            const lat = coordinate[1];
 
-        // Fetch gas emissions information
-        fetchGasInfo(lat, lon);
-    });
+            // Fetch gas emissions information
+            fetchGasInfo(lat, lon);
+        });
+    } else {
+        console.error("Map or OpenLayers library not properly initialized.");
+    }
+};
 
     function fetchGasInfo(lat, lon) {
         $.ajax({
