@@ -13,7 +13,9 @@ function loadMap(target, center, zoom) {
             zoom: zoom
         })
     });
+    window.map = map;
 }
+
 
 function addMapLayer(data) {
     if (data.errMsg) {

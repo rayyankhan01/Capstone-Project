@@ -1,14 +1,13 @@
 let currentLayer;
 
-
 $(function () {
   // Initial map load
   loadMap("map", ol.proj.transform([54.0000, 24.0000], 'EPSG:4326', 'EPSG:3857'), 7);
-  
+
   // Call test function with the default selected gas when the page loads
   const defaultGas = $('#gas-select').val();
-  test(defaultGas);
-  
+  test(defaultGas); // Note: Ensure this is the correct usage as per your application's logic
+
   // Dropdown selection change handler
   $('#gas-select').change(function() {
     var selectedGas = $(this).val();
@@ -17,46 +16,29 @@ $(function () {
 });
 
 const gasVizParams = {
-  "SO2":{
-    min: 0.0,
-    max: 0.0005,
-    palette: ['black', 'blue', 'purple', 'cyan', 'green', 'yellow', 'red']
-  },
-    "NO2":{
-    min: 0.0,
-    max: 0.0002,
-    palette: ['purple', 'blue', 'green', 'yellow', 'red']
-  },
-    "CO":{
-    min: 0.0,
-    max: 0.05,
-    palette: ['black', 'blue', 'green', 'yellow', 'red']
-  },
-    "HCHO":{
-    min: 0.0,
-    max: 0.0001,
-    palette: ['black', 'blue', 'green', 'yellow', 'red']
-  },
-    "O3":{
-    min: 0.0,
-    max: 0.0003,
-    palette: ['black', 'blue', 'green', 'yellow', 'red']
-  },
-    "CH4":{
-    min: 1750,
-    max: 1900,
-    palette: ['black', 'blue', 'green', 'yellow', 'red']
-  },
-  };
-
-
+  "SO2": {'bands': ['SO2_column_number_density'], 'min': 0, 'max': 0.0005,
+                'palette': ['black', 'blue', 'purple', 'cyan', 'green', 'yellow', 'red']},
+        "NO2": {'bands': ['NO2_column_number_density'], 'min': 0, 'max': 0.0002,
+                'palette': ['purple', 'blue', 'green', 'yellow', 'red']},
+        "CO": {'bands': ['CO_column_number_density'], 'min': 0, 'max': 0.05,
+               'palette': ['black', 'blue', 'green', 'yellow', 'red']},
+        "HCHO": {'bands': ['tropospheric_HCHO_column_number_density'], 'min': 0, 'max': 0.0001,
+                 'palette': ['black', 'blue', 'green', 'yellow', 'red']},
+        "O3": {'bands': ['O3_column_number_density'], 'min': 0, 'max': 0.0003,
+               'palette': ['black', 'blue', 'green', 'yellow', 'red']},
+        "CH4": {'bands': ['CH4_column_volume_mixing_ratio_dry_air'], 'min': 1750, 'max': 1900,
+                'palette': ['black', 'blue', 'green', 'yellow', 'red']},
+};
 
 function test(selectedGas) {
+   const startDate = $('#start-date').val();
+   const endDate = $('#end-date').val();
+
   $.ajax({
-    url: api_url + "test",
+    url: api_url + "test", // Make sure api_url is correctly defined
     type: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ gas: selectedGas }),
+    data: JSON.stringify({ gas: selectedGas, startDate: startDate, endDate: endDate }),
     success: function(data) {
       if (currentLayer) {
         map.removeLayer(currentLayer); // Remove the existing layer
@@ -70,6 +52,12 @@ function test(selectedGas) {
     }
   });
 }
+
+$('#gas-select').change(function() {
+    updateDatePickerRange($(this).val());
+    test($(this).val()); // Ensure test is called with the current gas as parameter
+});
+
 function addMapLayer(url) {
   const newLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
@@ -82,72 +70,79 @@ function addMapLayer(url) {
 }
 
 function updateLegend(minValue, maxValue, palette) {
-  // Update legend text
+  // Clear the existing legend content
+  var legendCanvas = document.getElementById('legend-canvas');
+  var ctx = legendCanvas.getContext('2d');
+  ctx.clearRect(0, 0, legendCanvas.width, legendCanvas.height);
+
+  // Calculate the width of each color band
+  var numColors = palette.length;
+  var bandWidth = legendCanvas.width / numColors;
+
+  // Draw the color gradient
+  for (var i = 0; i < numColors; i++) {
+    ctx.fillStyle = palette[i];
+    ctx.fillRect(i * bandWidth, 0, bandWidth, legendCanvas.height);
+  }
+
+  // Update the legend min and max values
   document.getElementById('legend-min').textContent = minValue;
   document.getElementById('legend-max').textContent = maxValue;
 
-  // Draw the gradient on the canvas
-  var canvas = document.getElementById('legend-canvas');
-  var ctx = canvas.getContext('2d');
-
-  var gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-  for (var i = 0; i < palette.length; i++) {
-    gradient.addColorStop(i / (palette.length - 1), palette[i]);
-  }
-
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('legend-min').textContent = minValue;
+  document.getElementById('legend-max').textContent = maxValue;
 }
 
-// JavaScript to fetch the data and display the chart
-// Function to fetch and display the NO2 chart
-// function fetchAndDisplayNO2TimeSeries() {
-//     fetch('/api/get-no2-timeseries') // Adjust this endpoint as necessary
-//     .then(response => response.json())
-//     .then(data => {
-//         const labels = data.map(item => item.date);
-//         const no2Values = data.map(item => item.mean_no2);
-//
-//         const ctx = document.getElementById('no2-chart').getContext('2d');
-//         new Chart(ctx, {
-//             type: 'line',
-//             data: {
-//                 labels: labels,  // x-axis labels (dates)
-//                 datasets: [{
-//                     label: 'Daily Mean NO2 Concentration',
-//                     data: no2Values,  // y-axis values
-//                     borderColor: 'rgb(75, 192, 192)',
-//                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
-//                     fill: false,
-//                     tension: 0.1
-//                 }]
-//             },
-//             options: {
-//                 scales: {
-//                     y: {
-//                         beginAtZero: false,  // Depending on NO2 values, adjust this
-//                         title: {
-//                             display: true,
-//                             text: 'NO2 Concentration'
-//                         }
-//                     },
-//                     x: {
-//                         title: {
-//                             display: true,
-//                             text: 'Date'
-//                         }
-//                     }
-//                 }
-//             }
-//         });
-//     })
-//     .catch(error => console.error('Error:', error));
-// }
-//
-// // Ensure you call this function when the document is ready
-// document.addEventListener('DOMContentLoaded', function() {
-//     fetchAndDisplayNO2TimeSeries();
-// });
+$(document).ready(function() {
+
+    // Initialize the DatePickers
+    $("#start-date").datepicker({
+        dateFormat: "yy-mm-dd",
+        onSelect: function() {
+            test($('#gas-select').val()); // Call test with the current gas when a date is selected
+        }
+    });
+    $("#end-date").datepicker({
+        dateFormat: "yy-mm-dd",
+        onSelect: function() {
+            test($('#gas-select').val()); // Call test with the current gas when a date is selected
+        }
+    });
+
+    // Adjust date picker range based on the selected gas
+    $('#gas-select').change(function() {
+        updateDatePickerRange($(this).val()); // Adjust date picker range
+        test($(this).val()); // Refresh the data layer
+    });
+});
+
+function updateDatePickerRange(selectedGas) {
+    var minDate, maxDate = new Date(); // maxDate is today for all gases.
+    switch(selectedGas) {
+        case "SO2":
+            minDate = new Date(2018, 6, 10);
+            break;
+        case "NO2":
+        case "CO":
+            minDate = new Date(2018, 5, 28);
+            break;
+        case "HCHO":
+            minDate = new Date(2018, 9, 2);
+            break;
+        case "O3":
+            minDate = new Date(2018, 6, 10);
+            break;
+        case "CH4":
+            minDate = new Date(2019, 1, 8);
+            break;
+        default:
+            minDate = new Date(2018, 5, 28); // Default min date if gas is unselected or unknown.
+    }
+
+    $("#start-date, #end-date").datepicker('option', 'minDate', minDate);
+    $("#start-date, #end-date").datepicker('option', 'maxDate', maxDate);
+}
+
 
 
 
