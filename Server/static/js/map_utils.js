@@ -29,7 +29,6 @@ function addMapLayer(data) {
     }
 }
 
-
 function addTileServerURL(url, layerID) {
     var geeLayer = new ol.layer.Tile({
         source: new ol.source.XYZ({
@@ -40,3 +39,4 @@ function addTileServerURL(url, layerID) {
     });
     map.addLayer(geeLayer);
 };
+

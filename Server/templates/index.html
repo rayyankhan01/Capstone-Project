@@ -154,11 +154,16 @@
 
     <footer>
         <p>Footer content goes here</p>
-      <iframe src="https://ee-b00087899.projects.earthengine.app/view/test" width="600" height="400"></iframe>
+        <div id="graphcontainer" style="height: 500px;"></div>
     </footer>
     <canvas id="no2-chart"></canvas>
 
 <!-- Bootstrap script -->
+
+<script
+  type="text/javascript"
+  src="https://code.highcharts.com/highcharts.js"
+></script>
 <script>
 $(document).ready(function() {
     $("#start-date").datepicker({
@@ -172,5 +177,12 @@ $(document).ready(function() {
 </script>
 
 <script src="../static/js/map_click_handler.js"></script>
+
+<!-- Script for the Chart  -->
+<script
+type="text/javascript"
+src="https://code.highcharts.com/highcharts.js"
+></script>
+
 </body>
 </html>

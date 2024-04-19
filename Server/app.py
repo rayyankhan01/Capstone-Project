@@ -96,6 +96,58 @@ def test():
 
 
 
+@app.route('/timeSeriesIndex', methods=['POST'])
+def time_series_index():
+    request_data = request.get_json()
+    selected_gas = request_data['gas']
+    start_date = request_data['startDate']
+    end_date = request_data['endDate']
+
+    # Dictionary to map gases to their corresponding image collection IDs
+    gas_to_collection = {
+        "SO2": "COPERNICUS/S5P/NRTI/L3_SO2",
+        "NO2": "COPERNICUS/S5P/NRTI/L3_NO2",
+        "CO": "COPERNICUS/S5P/NRTI/L3_CO",
+        "HCHO": "COPERNICUS/S5P/NRTI/L3_HCHO",
+        "O3": "COPERNICUS/S5P/NRTI/L3_O3",
+        "CH4": "COPERNICUS/S5P/OFFL/L3_CH4",
+    }
+
+    # Visualization parameters for each gas
+    gas_viz_params = {
+        "SO2": {'bands': ['SO2_column_number_density']},
+        "NO2": {'bands': ['NO2_column_number_density']},
+        "CO": {'bands': ['CO_column_number_density']},
+        "HCHO": {'bands': ['tropospheric_HCHO_column_number_density']},
+        "O3": {'bands': ['O3_column_number_density']},
+        "CH4": {'bands': ['CH4_column_volume_mixing_ratio_dry_air']},
+    }
+
+    # Get the image collection ID and bands from the dictionaries
+    collection_id = gas_to_collection[selected_gas]
+    band_viz = gas_viz_params[selected_gas]['bands']
+
+    # Fetch the collection and filter for the UAE
+    countries = ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
+    uae = countries.filter(ee.Filter.eq('country_na', 'United Arab Emirates'))
+    uae_boundaries = uae.first().geometry()
+
+    collection = ee.ImageCollection(collection_id) \
+        .select(band_viz) \
+        .filterDate(start_date, end_date) \
+        .filterBounds(uae_boundaries)
+
+    # Get the time series data
+    time_series = collection.getRegionStats(uae_boundaries, 'mean')
+
+    # Convert the time series data to a list of dictionaries
+    values = [{'date': data.get('date').value, 'value': data.get('mean')} for data in time_series.getInfo()]
+
+    return jsonify(values), 200
+
+
+
+    
 
 if __name__ == '__main__':
     app.run()

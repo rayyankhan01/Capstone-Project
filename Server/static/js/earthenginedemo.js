@@ -1,4 +1,6 @@
 let currentLayer;
+let currentChart;
+let bandCollector;
 
 $(function () {
   // Initial map load
@@ -47,6 +49,7 @@ function test(selectedGas) {
       const vizParams = gasVizParams[selectedGas];
       updateLegend(vizParams.min, vizParams.max, vizParams.palette);
     },
+  
     error: function(jqXHR, textStatus, errorThrown) {
       console.error('Error fetching data:', textStatus, errorThrown);
     }
@@ -146,5 +149,67 @@ function updateDatePickerRange(selectedGas) {
 
 
 
+function timeSeriesIndex(selectedGas) {
+  const startDate = $('#start-date').val();
+  const endDate = $('#end-date').val();
+  let bandCollector;
+  let defReducer = 'mean'
+  switch (selectedGas) {
+    case "SO2":
+      bandCollector = "SO2_column_number_density";
+      break;
+    case "NO2":
+      bandCollector = "NO2_column_number_density";
+      break;
+    case "CO":
+      bandCollector = "CO_column_number_density	";
+      break;
+    case "HCHO":
+      bandCollector = "tropospheric_HCHO_column_number_density";
+      break;
+    case "O3":
+      bandCollector = "O3_column_number_density	";
+      break;
+    case "CH4":
+      bandCollector = "CH4_column_volume_mixing_ratio_dry_air";
+      break;  
+    // Add more cases for other gases as needed
+    default:
+      bandCollector = "DEFAULT_BANDS";
+      break;
+  }
+
+  $.ajax({
+    url: api_url + 'timeSeriesIndex',
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+      collectionNameTimeSeries: selectedGas, // Assuming selectedGas is the collection name
+      startDate,
+      endDate,
+      bandCollector,
+      defReducer
+      //scale: $("#scale").val(),
+    }),
+    success: function (data) {
+      if (currentChart) {
+        // Update or recreate the existing chart
+        updateChart(currentChart, data);
+      } else {
+        // Create the chart for the first time
+        currentChart = createChart('timeSeriesIndex', data.timeseries);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error('Error fetching time series data:', textStatus, errorThrown);
+    }
+  });
+}
+
+function updateChart(chart, data) {
+  // Update the existing chart with new data
+  // Assuming you have a function to update the chart
+  updateChartData(chart, data);
+}
 
 
