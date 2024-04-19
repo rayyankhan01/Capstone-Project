@@ -143,7 +143,7 @@ function updateDatePickerRange(selectedGas) {
     $("#start-date, #end-date").datepicker('option', 'maxDate', maxDate);
 }
 
-
+ 
 
 
 
