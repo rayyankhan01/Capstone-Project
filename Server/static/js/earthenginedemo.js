@@ -212,4 +212,31 @@ function updateChart(chart, data) {
   updateChartData(chart, data);
 }
 
+// this for the timeseries chart on the canvas 
+function getGasEmissions(lon, lat, startDate, endDate) {
+  // Define the ImageCollection and filter it by date
+  const Sent5PNO2 = ee.ImageCollection("COPERNICUS/S5P/OFFL/L3_NO2")
+    .filterDate(startDate, endDate)
+    .select('NO2_column_number_density');
+
+  const point = ee.Geometry.Point(lon, lat);
+  const timeSeries = ee.ImageCollection(Sent5PNO2)
+    .filterBounds(point)
+    .map(function(image) {
+      return image.reduceRegion({
+        reducer: ee.Reducer.mean(),
+        geometry: point,
+        scale: 500,
+      });
+    }).flatten();
+
+  const emissions = timeSeries.aggregate_array('system:time_start').map(function(date) {
+    return [ee.Date(date).format('MM-yy'), timeSeries.filter(ee.Filter.dateRangeContains('system:time_start', date, date.advance(1, 'day'))).first().get('NO2_column_number_density')];
+  });
+
+  return emissions;
+}
+
+
+
 
