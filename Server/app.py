@@ -32,6 +32,10 @@ def gas_info():
 def index():
     return render_template('index.html')
 
+@app.route('/trends')
+def trends():
+    return render_template('trends.html');
+
 
 from flask import Flask, jsonify
 import ee
