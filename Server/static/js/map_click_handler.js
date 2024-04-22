@@ -16,30 +16,27 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
 function fetchGasInfo(lat, lon) {
-        $.ajax({
-            url: "/gas-info", // Adjust according to your Flask app's URL structure
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({ latitude: lat, longitude: lon }),
-            success: function(data) {
-                // Display gas information and coordinates in the offcanvas
-                displayGasInfo(data, lat, lon);
-            },
-            error: function(error) {
-                console.error('Error fetching gas information:', error);
-            }
-        });
-    }
-    function displayGasInfo(data, lat, lon) {
-        const gasInfoElement = document.getElementById('gasEmissionsInfo');
-        gasInfoElement.innerHTML = `<p><strong>Latitude:</strong> ${lat.toFixed(3)}, <strong>Longitude:</strong> ${lon.toFixed(3)}</p>`; // Display coordinates with 3 decimal places
+    $.ajax({
+        url: "/gas-info",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ latitude: lat, longitude: lon }),
+        success: function(data) {
+            displayGasInfo(data, lat, lon);
+        },
+        error: function(error) {
+            console.error('Error fetching gas information:', error);
+        }
+    });
+}
+function displayGasInfo(data, lat, lon) {
+    const gasInfoElement = document.getElementById('gasEmissionsInfo');
+    gasInfoElement.innerHTML = `<p><strong>Latitude:</strong> ${lat.toFixed(3)}, <strong>Longitude:</strong> ${lon.toFixed(3)}</p>`;
 
-        // Append gas data to the offcanvas
-        Object.keys(data).forEach(gas => {
-            gasInfoElement.innerHTML += `<p><strong>${gas}:</strong> ${data[gas]}</p>`;
-        });
+    Object.keys(data).forEach(gas => {
+        gasInfoElement.innerHTML += `<p><strong>${gas}:</strong> ${data[gas]}</p>`;
+    });
 
-        // Open the offcanvas
-        new bootstrap.Offcanvas(document.getElementById('gasInfoOffcanvas')).show();
-    }
+    new bootstrap.Offcanvas(document.getElementById('gasInfoOffcanvas')).show();
+}
 });
