@@ -20,6 +20,12 @@
     <!-- Load custom scripts -->
     <script src="../static/js/map_utils.js"></script>
     <script src="../static/js/earthenginedemo.js"></script>
+    <script src="/static/js/chart_utils.js"></script>
+    <script
+    type="text/javascript"
+    src="https://code.highcharts.com/highcharts.js"
+    ></script>
+
 </head>
 <body>
     <!-- Navigation bar -->
@@ -88,21 +94,14 @@
     <button id="refresh-layer">Refresh</button>
 
     <!-- The charts and description cards -->
-
-
-
     <footer>
         <p>Footer content goes here</p>
-        <div id="graphcontainer" style="height: 500px;"></div>
+        <div id="graphcontainer" style="height: calc(50vh - 50px)"></div>
     </footer>
     <canvas id="no2-chart"></canvas>
 
 <!-- Bootstrap script -->
 
-<script
-  type="text/javascript"
-  src="https://code.highcharts.com/highcharts.js"
-></script>
 <script>
 $(document).ready(function() {
     $("#start-date").datepicker({
@@ -112,16 +111,8 @@ $(document).ready(function() {
         dateFormat: "yy-mm-dd"
     });
 });
-
 </script>
-
 <script src="../static/js/map_click_handler.js"></script>
-
 <!-- Script for the Chart  -->
-<script
-type="text/javascript"
-src="https://code.highcharts.com/highcharts.js"
-></script>
-
 </body>
 </html>

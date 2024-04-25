@@ -59,6 +59,7 @@ function test(selectedGas) {
 $('#gas-select').change(function() {
     updateDatePickerRange($(this).val());
     test($(this).val()); // Ensure test is called with the current gas as parameter
+    timeSeriesIndex($(this).val()) // ---> ?
 });
 
 function addMapLayer(url) {
@@ -103,12 +104,15 @@ $(document).ready(function() {
         dateFormat: "yy-mm-dd",
         onSelect: function() {
             test($('#gas-select').val()); // Call test with the current gas when a date is selected
+            timeSeriesIndex($('#gas-select').val());// new 
         }
     });
     $("#end-date").datepicker({
         dateFormat: "yy-mm-dd",
         onSelect: function() {
             test($('#gas-select').val()); // Call test with the current gas when a date is selected
+             // new
+            timeSeriesIndex($('#gas-select').val()); // new
         }
     });
 
@@ -116,6 +120,7 @@ $(document).ready(function() {
     $('#gas-select').change(function() {
         updateDatePickerRange($(this).val()); // Adjust date picker range
         test($(this).val()); // Refresh the data layer
+        timeSeriesIndex($(this).val()); // new
     });
 });
 
@@ -146,65 +151,144 @@ function updateDatePickerRange(selectedGas) {
     $("#start-date, #end-date").datepicker('option', 'maxDate', maxDate);
 }
 
- 
-
-
+// Function to update the chart based on date selection
+// Initial chart creation
 function timeSeriesIndex(selectedGas) {
   const startDate = $('#start-date').val();
   const endDate = $('#end-date').val();
-  let bandCollector;
-  let defReducer = 'mean'
-  switch (selectedGas) {
-    case "SO2":
-      bandCollector = "SO2_column_number_density";
-      break;
-    case "NO2":
-      bandCollector = "NO2_column_number_density";
-      break;
-    case "CO":
-      bandCollector = "CO_column_number_density	";
-      break;
-    case "HCHO":
-      bandCollector = "tropospheric_HCHO_column_number_density";
-      break;
-    case "O3":
-      bandCollector = "O3_column_number_density	";
-      break;
-    case "CH4":
-      bandCollector = "CH4_column_volume_mixing_ratio_dry_air";
-      break;  
-    // Add more cases for other gases as needed
-    default:
-      bandCollector = "DEFAULT_BANDS";
-      break;
-  }
+
+  //console.log(JSON.stringify(theJson));
+  console.log("Gas Selection:", $("#gasSelection").val());
+  console.log("Start Date:", $("#startDate").val());
+  console.log("End Date:", $("#endDate").val());
+  $.ajax({
+    url: api_url + 'timeSeriesIndex',
+    type: "POST",
+    async: true,
+    crossDomain: true,
+    contentType: "application/json",
+    data: JSON.stringify({ gas: selectedGas, startDate: startDate, endDate: endDate }),
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+    console.warn(jqXHR + textStatus + errorThrown);
+    $("#overlay").hide();
+  }).done(function(data, _textStatus, _jqXHR) {
+    if (data.errMsg) {
+      console.info(data.errMsg);
+    } else {
+      if (data.hasOwnProperty("timeseries")) {
+        createChart('timeSeriesIndex', data.timeseries);
+      } else {
+        console.warn("Wrong Data Returned");
+        console.log(data);
+      }
+    }
+    $("#overlay").hide()
+  });
+}
+
+// Initial chart creation (call this function to create the initial chart)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+function timeSeriesIndex() {
+  const theJson = {
+    gasSelection: $("#gasSelection").val(),
+    startDate: $("#fromDate").val(),
+    endDate: $("#toDate").val(),
+    scale: $("#scale").val(),
+  };
 
   $.ajax({
     url: api_url + 'timeSeriesIndex',
     type: "POST",
+    async: true,
+    crossDomain: true,
     contentType: "application/json",
-    data: JSON.stringify({
-      collectionNameTimeSeries: selectedGas, // Assuming selectedGas is the collection name
-      startDate,
-      endDate,
-      bandCollector,
-      defReducer
-      //scale: $("#scale").val(),
-    }),
-    success: function (data) {
-      if (currentChart) {
-        // Update or recreate the existing chart
-        updateChart(currentChart, data);
+    data: JSON.stringify(theJson)
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+    console.warn(jqXHR + textStatus + errorThrown);
+    $("#overlay").hide();
+  }).done(function(data, _textStatus, _jqXHR) {
+    if (data.errMsg) {
+      console.info(data.errMsg);
+    } else {
+      if (data.hasOwnProperty("timeseries")) {
+        createChart('timeSeriesIndex', data.timeseries);
       } else {
-        // Create the chart for the first time
-        currentChart = createChart('timeSeriesIndex', data.timeseries);
+        console.warn("Wrong Data Returned");
+        console.log(data);
       }
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      console.error('Error fetching time series data:', textStatus, errorThrown);
     }
+    $("#overlay").hide()
   });
 }
+
+
+// Function to update the chart based on date selection
+function updateChartByDate() {
+  const startDate = $("#startDate").val();
+  const endDate = $("#endDate").val();
+
+  if (startDate && endDate) {
+    const theJson = {
+      gasSelection: $("#gasSelection").val(),
+      startDate: startDate,
+      endDate: endDate,
+      scale: $("#scale").val(),
+    };
+
+    $.ajax({
+      url: api_url + 'timeSeriesIndex',
+      type: "POST",
+      async: true,
+      crossDomain: true,
+      contentType: "application/json",
+      data: JSON.stringify(theJson)
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      console.warn(jqXHR + textStatus + errorThrown);
+      $("#overlay").hide();
+    }).done(function(data, _textStatus, _jqXHR) {
+      if (data.errMsg) {
+        console.info(data.errMsg);
+      } else {
+        if (data.hasOwnProperty("timeseries")) {
+          // Update the chart with the new data
+          updateChart('timeSeriesIndex', data.timeseries);
+        } else {
+          console.warn("Wrong Data Returned");
+          console.log(data);
+        }
+      }
+      $("#overlay").hide()
+    });
+  }
+}
+
+
+
+
+
+
+
+
 
 function updateChart(chart, data) {
   // Update the existing chart with new data
@@ -212,9 +296,15 @@ function updateChart(chart, data) {
   updateChartData(chart, data);
 }
 
+==================================================================================
+*/
+  
+/*
 // this for the timeseries chart on the canvas 
-function getGasEmissions(lon, lat, startDate, endDate) {
-  // Define the ImageCollection and filter it by date
+function getGasEmissions(lon, lat, startDate, endDate,gasType) {
+
+
+
   const Sent5PNO2 = ee.ImageCollection("COPERNICUS/S5P/OFFL/L3_NO2")
     .filterDate(startDate, endDate)
     .select('NO2_column_number_density');
@@ -236,7 +326,7 @@ function getGasEmissions(lon, lat, startDate, endDate) {
 
   return emissions;
 }
-
+*/
 
 
 

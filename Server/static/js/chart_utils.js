@@ -56,8 +56,3 @@ function createChart(wText,wTimeSeriesData)
           ],
         });
       }
-
-
-
-
- k
