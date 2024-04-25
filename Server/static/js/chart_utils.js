@@ -50,7 +50,7 @@ function createChart(wText,wTimeSeriesData)
             {
               type: "line",
               name: wText,
-              data: wTimeseriesData,
+              data: wTimeSeriesData,
               color: "#31bab0",
             },
           ],

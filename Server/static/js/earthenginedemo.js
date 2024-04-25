@@ -175,13 +175,29 @@ function timeSeriesIndex(selectedGas) {
 function prepareChartData(rawData) {
   return rawData
     .map(item => {
-      const x = Date.parse(item[0]); // parse the date
-      const y = parseFloat(item[1]); // convert the value to a float
-      return [x, y];
+      // Check if the timestamp is in the expected format, if not, handle accordingly
+      const timestamp = item[0]; // assuming this is where the timestamp is in your data
+      let parsedDate;
+
+      // Handle different possible formats for the timestamp
+      if (typeof timestamp === 'string') {
+          console.log(timestamp);
+        // If the timestamp is a string, attempt to parse it
+        parsedDate = Date.parse(timestamp);
+      } else if (typeof timestamp === 'number') {
+        // If the timestamp is a number, it might already be in milliseconds
+        parsedDate = new Date(timestamp).getTime();
+      } else {
+        // If the timestamp is in an unexpected format, log an error or handle it as needed
+        console.error('Unexpected timestamp format:', timestamp);
+        parsedDate = NaN; // This will filter out the invalid data point later
+      }
+
+      const value = parseFloat(item[1]); // convert the value to a float
+      return [parsedDate, value];
     })
     .filter(item => !isNaN(item[0]) && !isNaN(item[1])); // filter out invalid data points
 }
-
 
 
 // Initial chart creation (call this function to create the initial chart)
