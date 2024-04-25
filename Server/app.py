@@ -145,15 +145,15 @@ def time_series_index():
 
         request_json = request.get_json()
         print('Received JSON:', request_json)
-        
+
         if request_json:
-            gas_selection = request_json.get('gasSelection', None)
+            gas_selection = request_json.get('gas', None)
             start_date = request_json.get('startDate', None)
             end_date = request_json.get('endDate', None)
 
             # Get the collection name and index name based on the gas selection
             gas_info = gas_mapping.get(gas_selection, None)
-          
+
             if gas_info and start_date and end_date:
                 values = get_time_series_by_collection_and_index(gas_info['collection_name'],
                                                                   gas_info['index_name'],

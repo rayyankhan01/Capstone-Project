@@ -98,29 +98,21 @@ function updateLegend(minValue, maxValue, palette) {
 }
 
 $(document).ready(function() {
-
-    // Initialize the DatePickers
-    $("#start-date").datepicker({
+    // Initializers for date pickers with added triggers for time series index updates
+    $("#start-date, #end-date").datepicker({
         dateFormat: "yy-mm-dd",
         onSelect: function() {
-            test($('#gas-select').val()); // Call test with the current gas when a date is selected
-            timeSeriesIndex($('#gas-select').val());// new 
-        }
-    });
-    $("#end-date").datepicker({
-        dateFormat: "yy-mm-dd",
-        onSelect: function() {
-            test($('#gas-select').val()); // Call test with the current gas when a date is selected
-             // new
-            timeSeriesIndex($('#gas-select').val()); // new
+            let selectedGas = $('#gas-select').val();
+            test(selectedGas);
+            timeSeriesIndex(selectedGas); // Ensure this function is called with the correct gas
         }
     });
 
-    // Adjust date picker range based on the selected gas
+    // Ensuring time series index is updated on gas selection changes
     $('#gas-select').change(function() {
-        updateDatePickerRange($(this).val()); // Adjust date picker range
-        test($(this).val()); // Refresh the data layer
-        timeSeriesIndex($(this).val()); // new
+        updateDatePickerRange($(this).val());
+        test($(this).val());
+        timeSeriesIndex($(this).val());
     });
 });
 
@@ -157,10 +149,6 @@ function timeSeriesIndex(selectedGas) {
   const startDate = $('#start-date').val();
   const endDate = $('#end-date').val();
 
-  //console.log(JSON.stringify(theJson));
-  console.log("Gas Selection:", $("#gasSelection").val());
-  console.log("Start Date:", $("#startDate").val());
-  console.log("End Date:", $("#endDate").val());
   $.ajax({
     url: api_url + 'timeSeriesIndex',
     type: "POST",
@@ -168,23 +156,33 @@ function timeSeriesIndex(selectedGas) {
     crossDomain: true,
     contentType: "application/json",
     data: JSON.stringify({ gas: selectedGas, startDate: startDate, endDate: endDate }),
-  }).fail(function(jqXHR, textStatus, errorThrown) {
-    console.warn(jqXHR + textStatus + errorThrown);
-    $("#overlay").hide();
-  }).done(function(data, _textStatus, _jqXHR) {
-    if (data.errMsg) {
-      console.info(data.errMsg);
-    } else {
-      if (data.hasOwnProperty("timeseries")) {
-        createChart('timeSeriesIndex', data.timeseries);
+    success: function(data) {
+      if (data.timeseries) {
+          const ChartData = prepareChartData(data.timeseries);
+        // Now correctly passing the 'timeseries' data and a title for the chart
+          console.log("Timeseries data:", ChartData);
+        createChart(selectedGas, ChartData);
       } else {
-        console.warn("Wrong Data Returned");
-        console.log(data);
+        console.error('Expected timeseries data not found.');
+        console.log(data.errMsg || 'No error message provided');
       }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.error('Error fetching time series data:', textStatus, errorThrown);
     }
-    $("#overlay").hide()
   });
 }
+function prepareChartData(rawData) {
+  return rawData
+    .map(item => {
+      const x = Date.parse(item[0]); // parse the date
+      const y = parseFloat(item[1]); // convert the value to a float
+      return [x, y];
+    })
+    .filter(item => !isNaN(item[0]) && !isNaN(item[1])); // filter out invalid data points
+}
+
+
 
 // Initial chart creation (call this function to create the initial chart)
 
