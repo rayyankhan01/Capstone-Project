@@ -17,14 +17,7 @@
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Load custom scripts -->
-    <script src="../static/js/map_utils.js"></script>
-    <script src="../static/js/earthenginedemo.js"></script>
-    <script src="/static/js/chart_utils.js"></script>
-    <script
-    type="text/javascript"
-    src="https://code.highcharts.com/highcharts.js"
-    ></script>
+
 
 </head>
 <body>
@@ -80,17 +73,31 @@
             <div id="map"></div>
         </div>
 
+
+        <div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="gasInfoOffcanvas" aria-labelledby="gasInfoOffcanvasLabel">
+          <div class="offcanvas-header" style="background-color: #e3f2fd;">
+            <h5 id="gasInfoOffcanvasLabel">Gas Information</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <p>Click on the map to see gas emissions at that point.</p>
+            <div id="coordinatesInfo">
+              <strong>Latitude:</strong> <span id="latitudeValue"></span>, 
+              <strong>Longitude:</strong> <span id="longitudeValue"></span>
+            </div>
+            <div id="gasEmissionsInfo">
+              <ul class="list-unstyled">
+                <li><strong>CH4:</strong> <span id="ch4Value">Loading...</span></li>
+                <li><strong>CO:</strong> <span id="coValue">Loading...</span></li>
+                <li><strong>HCHO:</strong> <span id="hchoValue">Loading...</span></li>
+                <li><strong>NO2:</strong> <span id="no2Value">Loading...</span></li>
+                <li><strong>O3:</strong> <span id="o3Value">Loading...</span></li>
+                <li><strong>SO2:</strong> <span id="so2Value">Loading...</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
         
-   <div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="gasInfoOffcanvas" aria-labelledby="gasInfoOffcanvasLabel">
-      <div class="offcanvas-header">
-        <h5 id="gasInfoOffcanvasLabel">Gas Information</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body">
-        <p>Click on the map to see gas emissions at that point.</p>
-        <div id="gasEmissionsInfo"></div>
-      </div>
-    </div>
 
     <div id="legend" style="position: absolute; bottom: 20%; right: 10px; padding: 10px; background: white; z-index: 100; border: 1px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
       <div id="legend-title" style="text-align: center; font-weight: bold; margin-bottom: 5px;">Gas Concentration</div>
@@ -130,21 +137,51 @@
         <p>Footer content goes here</p>
         
     </footer>
-    <canvas id="no2-chart"></canvas>
+    <!-- <canvas id="no2-chart"></canvas> -->
 
 <!-- Bootstrap script -->
 
 <script>
-$(document).ready(function() {
+/*
+  $(document).ready(function() {
+    var today = new Date();
+    var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
+
     $("#start-date").datepicker({
-        dateFormat: "yy-mm-dd"
+        dateFormat: "yy-mm-dd",
+        defaultDate: lastWeek
     });
     $("#end-date").datepicker({
-        dateFormat: "yy-mm-dd"
+        dateFormat: "yy-mm-dd",
+        defaultDate: today
     });
 });
+*/
+$(document).ready(function() {
+    var today = new Date();
+    var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
 
+    $("#start-date").datepicker({
+        dateFormat: "yy-mm-dd",
+        defaultDate: lastWeek,
+        setDate: lastWeek
+    }).datepicker("setDate", lastWeek);
+
+    $("#end-date").datepicker({
+        dateFormat: "yy-mm-dd",
+        defaultDate: today,
+        setDate: today
+    }).datepicker("setDate", today);
+});
 </script>
+    <!-- Load custom scripts -->
+    <script src="../static/js/map_utils.js"></script>
+    <script src="../static/js/earthenginedemo.js"></script>
+    <script src="/static/js/chart_utils.js"></script>
+    <script
+    type="text/javascript"
+    src="https://code.highcharts.com/highcharts.js"
+    ></script>
 <script src="../static/js/map_click_handler.js"></script>
 <!-- Script for the Chart  -->
 </body>

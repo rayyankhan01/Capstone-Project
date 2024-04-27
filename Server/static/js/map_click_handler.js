@@ -31,11 +31,20 @@ function fetchGasInfo(lat, lon) {
 }
 function displayGasInfo(data, lat, lon) {
     const gasInfoElement = document.getElementById('gasEmissionsInfo');
-    gasInfoElement.innerHTML = `<p><strong>Latitude:</strong> ${lat.toFixed(3)}, <strong>Longitude:</strong> ${lon.toFixed(3)}</p>`;
+    document.getElementById('latitudeValue').textContent = lat.toFixed(3);
+    document.getElementById('longitudeValue').textContent = lon.toFixed(3);
 
-    Object.keys(data).forEach(gas => {
-        gasInfoElement.innerHTML += `<p><strong>${gas}:</strong> ${data[gas]}</p>`;
-    });
+    // Object.keys(data).forEach(gas => {
+    //     gasInfoElement.innerHTML += `<p><strong>${gas}:</strong> ${data[gas]}</p>`;
+    // });
+
+    // You can update the contents of the elements like this
+    document.getElementById('ch4Value').textContent = data['CH4'];
+    document.getElementById('coValue').textContent = data['CO'];
+    document.getElementById('hchoValue').textContent = data['HCHO'];
+    document.getElementById('no2Value').textContent = data['NO2'];
+    document.getElementById('o3Value').textContent = data['O3'];
+    document.getElementById('so2Value').textContent = data['SO2'];
 
     new bootstrap.Offcanvas(document.getElementById('gasInfoOffcanvas')).show();
 }
