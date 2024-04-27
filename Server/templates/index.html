@@ -20,6 +20,12 @@
     <!-- Load custom scripts -->
     <script src="../static/js/map_utils.js"></script>
     <script src="../static/js/earthenginedemo.js"></script>
+    <script src="/static/js/chart_utils.js"></script>
+    <script
+    type="text/javascript"
+    src="https://code.highcharts.com/highcharts.js"
+    ></script>
+
 </head>
 <body>
     <!-- Navigation bar -->
@@ -88,16 +94,14 @@
     <button id="refresh-layer">Refresh</button>
 
     <!-- The charts and description cards -->
-
-
-
     <footer>
         <p>Footer content goes here</p>
-      <iframe src="https://ee-b00087899.projects.earthengine.app/view/test" width="600" height="400"></iframe>
+        <div id="graphcontainer" style="height: calc(50vh - 50px)"></div>
     </footer>
     <canvas id="no2-chart"></canvas>
 
 <!-- Bootstrap script -->
+
 <script>
 $(document).ready(function() {
     $("#start-date").datepicker({
@@ -107,9 +111,8 @@ $(document).ready(function() {
         dateFormat: "yy-mm-dd"
     });
 });
-
 </script>
-
 <script src="../static/js/map_click_handler.js"></script>
+<!-- Script for the Chart  -->
 </body>
 </html>

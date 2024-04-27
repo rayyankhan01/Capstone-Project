@@ -1,4 +1,6 @@
 let currentLayer;
+let currentChart;
+let bandCollector;
 
 $(function () {
   // Initial map load
@@ -47,6 +49,7 @@ function test(selectedGas) {
       const vizParams = gasVizParams[selectedGas];
       updateLegend(vizParams.min, vizParams.max, vizParams.palette);
     },
+  
     error: function(jqXHR, textStatus, errorThrown) {
       console.error('Error fetching data:', textStatus, errorThrown);
     }
@@ -56,6 +59,7 @@ function test(selectedGas) {
 $('#gas-select').change(function() {
     updateDatePickerRange($(this).val());
     test($(this).val()); // Ensure test is called with the current gas as parameter
+    timeSeriesIndex($(this).val()) // ---> ?
 });
 
 function addMapLayer(url) {
@@ -94,25 +98,21 @@ function updateLegend(minValue, maxValue, palette) {
 }
 
 $(document).ready(function() {
-
-    // Initialize the DatePickers
-    $("#start-date").datepicker({
+    // Initializers for date pickers with added triggers for time series index updates
+    $("#start-date, #end-date").datepicker({
         dateFormat: "yy-mm-dd",
         onSelect: function() {
-            test($('#gas-select').val()); // Call test with the current gas when a date is selected
-        }
-    });
-    $("#end-date").datepicker({
-        dateFormat: "yy-mm-dd",
-        onSelect: function() {
-            test($('#gas-select').val()); // Call test with the current gas when a date is selected
+            let selectedGas = $('#gas-select').val();
+            test(selectedGas);
+            timeSeriesIndex(selectedGas); // Ensure this function is called with the correct gas
         }
     });
 
-    // Adjust date picker range based on the selected gas
+    // Ensuring time series index is updated on gas selection changes
     $('#gas-select').change(function() {
-        updateDatePickerRange($(this).val()); // Adjust date picker range
-        test($(this).val()); // Refresh the data layer
+        updateDatePickerRange($(this).val());
+        test($(this).val());
+        timeSeriesIndex($(this).val());
     });
 });
 
@@ -143,8 +143,204 @@ function updateDatePickerRange(selectedGas) {
     $("#start-date, #end-date").datepicker('option', 'maxDate', maxDate);
 }
 
- 
+// Function to update the chart based on date selection
+// Initial chart creation
+function timeSeriesIndex(selectedGas) {
+  const startDate = $('#start-date').val();
+  const endDate = $('#end-date').val();
 
+  $.ajax({
+    url: api_url + 'timeSeriesIndex',
+    type: "POST",
+    async: true,
+    crossDomain: true,
+    contentType: "application/json",
+    data: JSON.stringify({ gas: selectedGas, startDate: startDate, endDate: endDate }),
+    success: function(data) {
+      if (data.timeseries) {
+          const ChartData = prepareChartData(data.timeseries);
+        // Now correctly passing the 'timeseries' data and a title for the chart
+          console.log("Timeseries data:", ChartData);
+        createChart(selectedGas, ChartData);
+      } else {
+        console.error('Expected timeseries data not found.');
+        console.log(data.errMsg || 'No error message provided');
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.error('Error fetching time series data:', textStatus, errorThrown);
+    }
+  });
+}
+function prepareChartData(rawData) {
+  return rawData
+    .map(item => {
+      // Check if the timestamp is in the expected format, if not, handle accordingly
+      const timestamp = item[0]; // assuming this is where the timestamp is in your data
+      let parsedDate;
+
+      // Handle different possible formats for the timestamp
+      if (typeof timestamp === 'string') {
+          console.log(timestamp);
+        // If the timestamp is a string, attempt to parse it
+        parsedDate = Date.parse(timestamp);
+      } else if (typeof timestamp === 'number') {
+        // If the timestamp is a number, it might already be in milliseconds
+        parsedDate = new Date(timestamp).getTime();
+      } else {
+        // If the timestamp is in an unexpected format, log an error or handle it as needed
+        console.error('Unexpected timestamp format:', timestamp);
+        parsedDate = NaN; // This will filter out the invalid data point later
+      }
+
+      const value = parseFloat(item[1]); // convert the value to a float
+      return [parsedDate, value];
+    })
+    .filter(item => !isNaN(item[0]) && !isNaN(item[1])); // filter out invalid data points
+}
+
+
+// Initial chart creation (call this function to create the initial chart)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+function timeSeriesIndex() {
+  const theJson = {
+    gasSelection: $("#gasSelection").val(),
+    startDate: $("#fromDate").val(),
+    endDate: $("#toDate").val(),
+    scale: $("#scale").val(),
+  };
+
+  $.ajax({
+    url: api_url + 'timeSeriesIndex',
+    type: "POST",
+    async: true,
+    crossDomain: true,
+    contentType: "application/json",
+    data: JSON.stringify(theJson)
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+    console.warn(jqXHR + textStatus + errorThrown);
+    $("#overlay").hide();
+  }).done(function(data, _textStatus, _jqXHR) {
+    if (data.errMsg) {
+      console.info(data.errMsg);
+    } else {
+      if (data.hasOwnProperty("timeseries")) {
+        createChart('timeSeriesIndex', data.timeseries);
+      } else {
+        console.warn("Wrong Data Returned");
+        console.log(data);
+      }
+    }
+    $("#overlay").hide()
+  });
+}
+
+
+// Function to update the chart based on date selection
+function updateChartByDate() {
+  const startDate = $("#startDate").val();
+  const endDate = $("#endDate").val();
+
+  if (startDate && endDate) {
+    const theJson = {
+      gasSelection: $("#gasSelection").val(),
+      startDate: startDate,
+      endDate: endDate,
+      scale: $("#scale").val(),
+    };
+
+    $.ajax({
+      url: api_url + 'timeSeriesIndex',
+      type: "POST",
+      async: true,
+      crossDomain: true,
+      contentType: "application/json",
+      data: JSON.stringify(theJson)
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      console.warn(jqXHR + textStatus + errorThrown);
+      $("#overlay").hide();
+    }).done(function(data, _textStatus, _jqXHR) {
+      if (data.errMsg) {
+        console.info(data.errMsg);
+      } else {
+        if (data.hasOwnProperty("timeseries")) {
+          // Update the chart with the new data
+          updateChart('timeSeriesIndex', data.timeseries);
+        } else {
+          console.warn("Wrong Data Returned");
+          console.log(data);
+        }
+      }
+      $("#overlay").hide()
+    });
+  }
+}
+
+
+
+
+
+
+
+
+
+function updateChart(chart, data) {
+  // Update the existing chart with new data
+  // Assuming you have a function to update the chart
+  updateChartData(chart, data);
+}
+
+==================================================================================
+*/
+  
+/*
+// this for the timeseries chart on the canvas 
+function getGasEmissions(lon, lat, startDate, endDate,gasType) {
+
+
+
+  const Sent5PNO2 = ee.ImageCollection("COPERNICUS/S5P/OFFL/L3_NO2")
+    .filterDate(startDate, endDate)
+    .select('NO2_column_number_density');
+
+  const point = ee.Geometry.Point(lon, lat);
+  const timeSeries = ee.ImageCollection(Sent5PNO2)
+    .filterBounds(point)
+    .map(function(image) {
+      return image.reduceRegion({
+        reducer: ee.Reducer.mean(),
+        geometry: point,
+        scale: 500,
+      });
+    }).flatten();
+
+  const emissions = timeSeries.aggregate_array('system:time_start').map(function(date) {
+    return [ee.Date(date).format('MM-yy'), timeSeries.filter(ee.Filter.dateRangeContains('system:time_start', date, date.advance(1, 'day'))).first().get('NO2_column_number_density')];
+  });
+
+  return emissions;
+}
+*/
 
 
 
