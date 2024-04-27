@@ -151,7 +151,7 @@ var iconStyle = new ol.style.Style({
         anchorXUnits: 'fraction',
         anchorYUnits: 'pixels',
         src: '/static/imgs/dot.svg', // Ensure this is a valid path to a marker image
-        scale: 0.05 // Smaller scale for the marker icon
+        scale: 0.03 // Smaller scale for the marker icon
     })
 });
 
