@@ -39,26 +39,38 @@
                 <li class="nav-item">
                   <a class="nav-link" href="/about">About</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/trends">Trends</a>
+                </li>
             </ul>
         </div>
     </nav>
 
 
     <ul class="nav justify-content-center">
-      <li class="nav-item">
+      <li class="nav-item me-3">
         <select class="form-select" id="gas-select">
-          <option value="SO2">Sulphur Dioxide</option>
-          <option value="NO2">Nitrogen Dioxide</option>
-          <option value="CO">Carbon Monoxide</option>
-          <option value="HCHO">Formaldehyde</option>
-          <option value="O3">Ozone</option>
-          <option value="CH4">Methane</option>
+            <option value="SO2">Sulphur Dioxide</option>
+            <option value="NO2">Nitrogen Dioxide</option>
+            <option value="CO">Carbon Monoxide</option>
+            <option value="HCHO">Formaldehyde</option>
+            <option value="O3">Ozone</option>
+            <option value="CH4">Methane</option>
         </select>
       </li>
-      <li class="nav-item">
-                <a class="nav-link" href="/trends">Trends</a>
+      <li class="nav-item me-3">
+          <div class="input-group mb-3">
+              <span class="input-group-text">Start Date:</span>
+              <input type="text" class="form-control" id="start-date" name="start-date">
+          </div>
       </li>
-      <li class="nav-item">
+      <li class="nav-item me-3">
+          <div class="input-group mb-3">
+              <span class="input-group-text">End Date:</span>
+              <input type="text" class="form-control" id="end-date" name="end-date">
+          </div>
+      </li>
+      <li class="nav-item me-3">
         <a class="nav-link disabled" aria-disabled="true">Disabled</a>
       </li>
     </ul>
@@ -87,11 +99,12 @@
         <span id="legend-max" style="float: right;">Max</span>
       </div>
     </div>
-    <label for="start-date">Start Date:</label>
+
+    <!-- <label for="start-date">Start Date:</label>
     <input type="text" id="start-date" name="start-date">
     <label for="end-date">End Date:</label>
     <input type="text" id="end-date" name="end-date">
-    <button id="refresh-layer">Refresh</button>
+    <button id="refresh-layer">Refresh</button> -->
 
     <!-- The charts and description cards -->
     <footer>
