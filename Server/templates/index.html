@@ -62,7 +62,7 @@
           <div class="input-group mb-3">
               <span class="input-group-text">Start Date:</span>
               <input type="text" class="form-control" id="start-date" name="start-date">
-          </div>
+          </div>  
       </li>
       <li class="nav-item me-3">
           <div class="input-group mb-3">
@@ -79,6 +79,8 @@
         <div id="map-container">
             <div id="map"></div>
         </div>
+
+        
    <div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="gasInfoOffcanvas" aria-labelledby="gasInfoOffcanvasLabel">
       <div class="offcanvas-header">
         <h5 id="gasInfoOffcanvasLabel">Gas Information</h5>
@@ -90,26 +92,43 @@
       </div>
     </div>
 
-        <!-- Add this inside your <body> tag -->
-    <div id="legend" style="position: absolute; bottom: 10px; right: 10px; padding: 10px; background: white; z-index: 100;">
-      <div id="legend-title">Gas Concentration</div>
+    <div id="legend" style="position: absolute; bottom: 20%; right: 10px; padding: 10px; background: white; z-index: 100; border: 1px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+      <div id="legend-title" style="text-align: center; font-weight: bold; margin-bottom: 5px;">Gas Concentration</div>
       <canvas id="legend-canvas" width="300" height="50"></canvas>
-      <div id="legend-min-max">
+      <div id="legend-min-max" style="display: flex; justify-content: space-between;">
         <span id="legend-min">Min</span>
-        <span id="legend-max" style="float: right;">Max</span>
+        <span id="legend-max">Max</span>
       </div>
     </div>
-
-    <!-- <label for="start-date">Start Date:</label>
-    <input type="text" id="start-date" name="start-date">
-    <label for="end-date">End Date:</label>
-    <input type="text" id="end-date" name="end-date">
-    <button id="refresh-layer">Refresh</button> -->
+    
+    <!-- <div id="graphcontainer" style="height: calc(50vh - 50px)"></div> -->
 
     <!-- The charts and description cards -->
+
+    <div class="container">
+      <div class="row">
+          <div class="col-12"> <!-- This specifies that the column should take the full width -->
+              <div class="card shadow-sm">
+                  <!-- Chart Container -->
+                  <div id="graphcontainer" class="card-img-top" style="height: 400px;"></div>
+                  
+                  <!-- Card Body -->
+                  <div class="card-body">
+                      <p class="card-text">This chart shows the selected gas concentrations over the selected period of time over the U.A.E</p>
+                      <div class="d-flex justify-content-between align-items-center">
+                          <small class="text-muted">Utilizing Sentinel 5P data</small>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  
+  
+
     <footer>
         <p>Footer content goes here</p>
-        <div id="graphcontainer" style="height: calc(50vh - 50px)"></div>
+        
     </footer>
     <canvas id="no2-chart"></canvas>
 
@@ -124,6 +143,7 @@ $(document).ready(function() {
         dateFormat: "yy-mm-dd"
     });
 });
+
 </script>
 <script src="../static/js/map_click_handler.js"></script>
 <!-- Script for the Chart  -->
