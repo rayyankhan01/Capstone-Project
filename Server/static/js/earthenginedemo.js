@@ -192,15 +192,6 @@ function addMarker(lat, lon, title) {
     vectorSource.addFeature(iconFeature);
 
     iconFeature.setId(title); // Setting an ID for the feature for easy retrieval
-    map.on('singleclick', function(evt) {
-        var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
-            return feature;
-        });
-        if (feature) {
-            const coordinates = ol.proj.toLonLat(feature.getGeometry().getCoordinates());
-            fetchOpenAQData(coordinates[1], coordinates[0]); // Fetch OpenAQ data
-        }
-    });
 }
 
 
