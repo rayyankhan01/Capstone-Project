@@ -9,7 +9,7 @@ $(function () {
   // Call test function with the default selected gas when the page loads
   const defaultGas = $('#gas-select').val();
   test(defaultGas); // Note: Ensure this is the correct usage as per your application's logic
-
+  timeSeriesIndex(defaultGas)
   // Dropdown selection change handler
   $('#gas-select').change(function() {
     var selectedGas = $(this).val();
