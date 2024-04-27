@@ -143,6 +143,74 @@ function updateDatePickerRange(selectedGas) {
     $("#start-date, #end-date").datepicker('option', 'maxDate', maxDate);
 }
 
+// Initialize the vector source and layer for markers
+// Define the icon style with a smaller scale for the marker
+var iconStyle = new ol.style.Style({
+    image: new ol.style.Icon({
+        anchor: [0.5, 46],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
+        src: '/static/imgs/dot.svg', // Ensure this is a valid path to a marker image
+        scale: 0.05 // Smaller scale for the marker icon
+    })
+});
+
+// Initialize the vector source
+var vectorSource = new ol.source.Vector({});
+
+// Initialize the vector layer with the icon style that has a smaller scale
+var vectorLayer = new ol.layer.Vector({
+    source: vectorSource,
+    style: iconStyle // Apply the style with a smaller icon scale
+});
+// Function to load station markers from OpenAQ API and add them to the map
+function loadStationsAndMarkers() {
+    $.ajax({
+        url: "https://api.openaq.org/v1/locations?country=AE",
+        type: "GET",
+        success: function(response) {
+            response.results.forEach(station => {
+                addMarker(station.coordinates.latitude, station.coordinates.longitude, station.location);
+            });
+            // Add the vector layer to the map only after all markers are added
+            map.addLayer(vectorLayer);
+        },
+        error: function() {
+            console.error('Failed to fetch station data');
+        }
+    });
+}
+
+// Function to add markers to the vector source with the smaller icon scale
+function addMarker(lat, lon, title) {
+    var iconFeature = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
+        name: title
+    });
+
+    iconFeature.setStyle(iconStyle); // Apply the style with the smaller icon scale
+    vectorSource.addFeature(iconFeature);
+
+    iconFeature.setId(title); // Setting an ID for the feature for easy retrieval
+    map.on('singleclick', function(evt) {
+        var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
+            return feature;
+        });
+        if (feature) {
+            const coordinates = ol.proj.toLonLat(feature.getGeometry().getCoordinates());
+            fetchOpenAQData(coordinates[1], coordinates[0]); // Fetch OpenAQ data
+        }
+    });
+}
+
+
+
+// Ensuring the stations and markers are loaded after the map is fully initialized
+document.addEventListener("DOMContentLoaded", function() {
+    loadStationsAndMarkers(); // Make sure this is called after the map is ready
+});
+
+
  
 
 
