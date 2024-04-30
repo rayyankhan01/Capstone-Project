@@ -1,11 +1,12 @@
 const AQI_BREAKPOINTS = {
-    "o3": [(0, 0.054, 0, 50), (0.055, 0.070, 51, 100), (0.071, 0.085, 101, 150), (0.086, 0.105, 151, 200), (0.106, 0.200, 201, 300)],
-    "no2": [(0, 53, 0, 50), (54, 100, 51, 100), (101, 360, 101, 150), (361, 649, 151, 200), (650, 1249, 201, 300), (1250, 2049, 301, 500)],
-    "so2": [(0, 35, 0, 50), (36, 75, 51, 100), (76, 185, 101, 150), (186, 304, 151, 200), (305, 604, 201, 300), (605, 1004, 301, 500)],
-    "co": [(0, 4.4, 0, 50), (4.5, 9.4, 51, 100), (9.5, 12.4, 101, 150), (12.5, 15.4, 151, 200), (15.5, 30.4, 201, 300), (30.5, 50.4, 301, 500)],
-    "pm25": [(0, 12, 0, 50), (12.1, 35.4, 51, 100), (35.5, 55.4, 101, 150), (55.5, 150.4, 151, 200), (150.5, 250.4, 201, 300), (250.5, 500.4, 301, 500)],
-    "pm10": [(0, 54, 0, 50), (55, 154, 51, 100), (155, 254, 101, 150), (255, 354, 151, 200), (355, 424, 201, 300), (425, 604, 300, 500)]
+    "o3": [[0, 0.054, 0, 50], [0.055, 0.070, 51, 100], [0.071, 0.085, 101, 150], [0.086, 0.105, 151, 200], [0.106, 0.200, 201, 300]],
+    "no2": [[0, 53, 0, 50], [54, 100, 51, 100], [101, 360, 101, 150], [361, 649, 151, 200], [650, 1249, 201, 300], [1250, 2049, 301, 500]],
+    "so2": [[0, 35, 0, 50], [36, 75, 51, 100], [76, 185, 101, 150], [186, 304, 151, 200], [305, 604, 201, 300], [605, 1004, 301, 500]],
+    "co": [[0, 4.4, 0, 50], [4.5, 9.4, 51, 100], [9.5, 12.4, 101, 150], [12.5, 15.4, 151, 200], [15.5, 30.4, 201, 300], [30.5, 50.4, 301, 500]],
+    "pm25": [[0, 12, 0, 50], [12.1, 35.4, 51, 100], [35.5, 55.4, 101, 150], [55.5, 150.4, 151, 200], [150.5, 250.4, 201, 300], [250.5, 500.4, 301, 500]],
+    "pm10": [[0, 54, 0, 50], [55, 154, 51, 100], [155, 254, 101, 150], [255, 354, 151, 200], [355, 424, 201, 300], [425, 604, 300, 500]]
 };
+
 
 const MOLAR_MASSES = {
     "no2": 46.0055, // g/mol
@@ -17,39 +18,46 @@ const MOLAR_MASSES = {
 
 // This function converts concentrations from µg/m³ to ppm or ppb
 function convertToAppropriateUnit(value, parameter) {
-    // Molar Volume at 25°C and 1 atm in Liters
-    const molarVolume = 24.45;
-    const microgramToGram = 1e-6; // Conversion from µg to g
-
-    // Check the parameter and apply the conversion based on the gas
+    const molarVolume = 24.45; // Molar Volume at 25°C and 1 atm in Liters
     switch (parameter) {
-        case 'o3': // Ozone (O3) conversion to ppm
-        case 'co': // Carbon Monoxide (CO) conversion to ppm
-            // µg/m³ to ppm
-            return (value * microgramToGram * molarVolume) / MOLAR_MASSES[parameter];
-        case 'so2': // Sulfur Dioxide (SO2) conversion to ppb
-        case 'no2': // Nitrogen Dioxide (NO2) conversion to ppb
-            // µg/m³ to ppb
-            return (value * microgramToGram * molarVolume * 1000) / MOLAR_MASSES[parameter];
-        case 'pm25': // Particulate Matter 2.5 remains in µg/m³
-        case 'pm10': // Particulate Matter 10 remains in µg/m³
+        case 'o3':
+        case 'co':
+            return (value * molarVolume) / (MOLAR_MASSES[parameter] * 1000);
+        case 'no2':
+        case 'so2':
+            return (value * molarVolume) / MOLAR_MASSES[parameter];
+        case 'pm25':
+        case 'pm10':
             return value; // No conversion needed
         default:
             console.error(`No conversion factor specified for ${parameter}`);
-            return value; // No conversion, return original value
+            return value; // Return original value if no conversion is available
     }
 }
 
 function calculateAQI(Cp, gas) {
-    const breakpoints = AQI_BREAKPOINTS[gas.toLowerCase()];
+    if (!AQI_BREAKPOINTS.hasOwnProperty(gas)) {
+        console.error(`No AQI breakpoints defined for "${gas}".`);
+        return "AQI not available"; // Guard against incorrect gas keys
+    }
+    const breakpoints = AQI_BREAKPOINTS[gas];
+    console.log(`Breakpoints for ${gas}:`, breakpoints);  // Log the breakpoints to check their format
+
     for (let i = 0; i < breakpoints.length; i++) {
-        const { 0: C_low, 1: C_high, 2: AQI_low, 3: AQI_high } = breakpoints[i];
+        if (breakpoints[i].length !== 4) {
+            console.error(`Breakpoint format error for ${gas} at index ${i}:`, breakpoints[i]);
+            continue; // Skip malformed breakpoint entries
+        }
+        const [C_low, C_high, AQI_low, AQI_high] = breakpoints[i];
         if (C_low <= Cp && Cp <= C_high) {
             return ((AQI_high - AQI_low) / (C_high - C_low)) * (Cp - C_low) + AQI_low;
         }
     }
-    return "AQI not available"; // No suitable range found
+    return "AQI not available"; // Return when concentration is out of defined ranges
 }
+
+
+
 document.addEventListener("DOMContentLoaded", function() {
     window.onload = function() {
         if (window.map) {
