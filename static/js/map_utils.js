@@ -4,7 +4,7 @@ if (window.location.hostname === "localhost" || window.location.hostname === "12
     api_url = "http://127.0.0.1:5000/";
 } else {
     // Azure web service
-    api_url = "https://red-cliff-eb0f2586f97a41b0b060af01f2b0123a.azurewebsites.net/";
+    api_url = "gasmaps.azurewebsites.net";
 
 }
 

@@ -10,11 +10,9 @@ from flask import Flask, jsonify
 import ee
 from datetime import datetime, timedelta
 
-
 app = Flask(__name__)
 CORS(app)
 ee.Initialize()
-
 
 MOLAR_VOLUME_AT_STP = 22.414  # Molar volume of gas at STP in liters
 MOLAR_MASSES = {  # Molar masses in g/mol
@@ -134,8 +132,6 @@ def gas_info():
     return jsonify(response_data)
 
 
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -144,7 +140,6 @@ def index():
 @app.route('/trends')
 def trends():
     return render_template('trends.html');
-
 
 
 @app.route('/test', methods=['POST'])
@@ -201,7 +196,7 @@ def test():
     return jsonify(url), 200
 
 
-#Dictionary for gasses and their respective collections and bands
+# Dictionary for gasses and their respective collections and bands
 gas_mapping = {
     "SO2": {
         'collection_name': "COPERNICUS/S5P/NRTI/L3_SO2",
@@ -218,24 +213,24 @@ gas_mapping = {
 
     "HCHO": {
         'collection_name': "COPERNICUS/S5P/NRTI/L3_HCHO",
-        'index_name':'tropospheric_HCHO_column_number_density'
+        'index_name': 'tropospheric_HCHO_column_number_density'
     },
-     "O3": {
+    "O3": {
         'collection_name': "COPERNICUS/S5P/NRTI/L3_O3",
         'index_name': 'O3_column_number_density'
     },
-     "CH4": {
+    "CH4": {
         'collection_name': "COPERNICUS/S5P/OFFL/L3_CH4",
         'index_name': 'CH4_column_volume_mixing_ratio_dry_air'
     },
 }
 
-#collection to filter the data
+# collection to filter the data
 countries = ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
 uae = countries.filter(ee.Filter.eq('country_na', 'United Arab Emirates'))
 uae_boundaries = uae.first().geometry()
 
-preset_reducer = 'mean' # reducer for the data
+preset_reducer = 'mean'  # reducer for the data
 preset_scale = 30
 
 
@@ -258,12 +253,12 @@ def time_series_index():
 
             if gas_info and start_date and end_date:
                 values = get_time_series_by_collection_and_index(gas_info['collection_name'],
-                                                                  gas_info['index_name'],
-                                                                  preset_scale,
-                                                                  uae_boundaries,
-                                                                  start_date,
-                                                                  end_date,
-                                                                  preset_reducer)
+                                                                 gas_info['index_name'],
+                                                                 preset_scale,
+                                                                 uae_boundaries,
+                                                                 start_date,
+                                                                 end_date,
+                                                                 preset_reducer)
             else:
                 raise Exception("Missing required parameters")
         else:
@@ -275,7 +270,9 @@ def time_series_index():
 
     return jsonify(values), 200
 
+
 if __name__ == '__main__':
     # Set the port to WEBSITES_PORT if it's set in the environment, otherwise default to 5000
     port = int(os.getenv('WEBSITES_PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+    print("Running on port:", port)
