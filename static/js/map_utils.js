@@ -1,5 +1,13 @@
 let map;
-const api_url = "red-cliff-eb0f2586f97a41b0b060af01f2b0123a.azurewebsites.net:8000";
+if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    // Local environment
+    api_url = "http://127.0.0.1:5000/";
+} else {
+    // Azure web service
+    api_url = "https://red-cliff-eb0f2586f97a41b0b060af01f2b0123a.azurewebsites.net/";
+
+}
+
 
 function loadMap(target, center, zoom) {
     const raster = new ol.layer.Tile({

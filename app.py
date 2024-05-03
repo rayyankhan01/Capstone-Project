@@ -1,3 +1,4 @@
+import os
 import traceback
 
 import requests
@@ -274,6 +275,7 @@ def time_series_index():
 
     return jsonify(values), 200
 
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    # Set the port to WEBSITES_PORT if it's set in the environment, otherwise default to 5000
+    port = int(os.getenv('WEBSITES_PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
