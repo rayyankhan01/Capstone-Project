@@ -1,5 +1,5 @@
 let map;
-const api_url = "red-cliff-eb0f2586f97a41b0b060af01f2b0123a.azurewebsites.net";
+const api_url = "red-cliff-eb0f2586f97a41b0b060af01f2b0123a.azurewebsites.net:8000";
 
 function loadMap(target, center, zoom) {
     const raster = new ol.layer.Tile({
