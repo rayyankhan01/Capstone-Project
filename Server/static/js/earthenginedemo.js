@@ -49,7 +49,6 @@ function test(selectedGas) {
       const vizParams = gasVizParams[selectedGas];
       updateLegend(vizParams.min, vizParams.max, vizParams.palette);
     },
-  
     error: function(jqXHR, textStatus, errorThrown) {
       console.error('Error fetching data:', textStatus, errorThrown);
     }
@@ -143,6 +142,66 @@ function updateDatePickerRange(selectedGas) {
     $("#start-date, #end-date").datepicker('option', 'maxDate', maxDate);
 }
 
+// Initialize the vector source and layer for markers
+// Define the icon style with a smaller scale for the marker
+var iconStyle = new ol.style.Style({
+    image: new ol.style.Icon({
+        anchor: [0.5, 46],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
+        src: '/static/imgs/dot.svg', // Ensure this is a valid path to a marker image
+        scale: 0.03 // Smaller scale for the marker icon
+    })
+});
+
+// Initialize the vector source
+var vectorSource = new ol.source.Vector({});
+
+// Initialize the vector layer with the icon style that has a smaller scale
+var vectorLayer = new ol.layer.Vector({
+    source: vectorSource,
+    style: iconStyle // Apply the style with a smaller icon scale
+});
+// Function to load station markers from OpenAQ API and add them to the map
+function loadStationsAndMarkers() {
+    $.ajax({
+        url: "https://api.openaq.org/v1/locations?country=AE",
+        type: "GET",
+        success: function(response) {
+            response.results.forEach(station => {
+                addMarker(station.coordinates.latitude, station.coordinates.longitude, station.location);
+            });
+            // Add the vector layer to the map only after all markers are added
+            map.addLayer(vectorLayer);
+        },
+        error: function() {
+            console.error('Failed to fetch station data');
+        }
+    });
+}
+
+// Function to add markers to the vector source with the smaller icon scale
+function addMarker(lat, lon, title) {
+    var iconFeature = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
+        name: title
+    });
+
+    iconFeature.setStyle(iconStyle); // Apply the style with the smaller icon scale
+    vectorSource.addFeature(iconFeature);
+
+    iconFeature.setId(title); // Setting an ID for the feature for easy retrieval
+}
+
+
+
+// Ensuring the stations and markers are loaded after the map is fully initialized
+document.addEventListener("DOMContentLoaded", function() {
+    loadStationsAndMarkers(); // Make sure this is called after the map is ready
+});
+
+
+ 
 // Function to update the chart based on date selection
 // Initial chart creation
 function timeSeriesIndex(selectedGas) {
@@ -198,149 +257,5 @@ function prepareChartData(rawData) {
     })
     .filter(item => !isNaN(item[0]) && !isNaN(item[1])); // filter out invalid data points
 }
-
-
-// Initial chart creation (call this function to create the initial chart)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-function timeSeriesIndex() {
-  const theJson = {
-    gasSelection: $("#gasSelection").val(),
-    startDate: $("#fromDate").val(),
-    endDate: $("#toDate").val(),
-    scale: $("#scale").val(),
-  };
-
-  $.ajax({
-    url: api_url + 'timeSeriesIndex',
-    type: "POST",
-    async: true,
-    crossDomain: true,
-    contentType: "application/json",
-    data: JSON.stringify(theJson)
-  }).fail(function(jqXHR, textStatus, errorThrown) {
-    console.warn(jqXHR + textStatus + errorThrown);
-    $("#overlay").hide();
-  }).done(function(data, _textStatus, _jqXHR) {
-    if (data.errMsg) {
-      console.info(data.errMsg);
-    } else {
-      if (data.hasOwnProperty("timeseries")) {
-        createChart('timeSeriesIndex', data.timeseries);
-      } else {
-        console.warn("Wrong Data Returned");
-        console.log(data);
-      }
-    }
-    $("#overlay").hide()
-  });
-}
-
-
-// Function to update the chart based on date selection
-function updateChartByDate() {
-  const startDate = $("#startDate").val();
-  const endDate = $("#endDate").val();
-
-  if (startDate && endDate) {
-    const theJson = {
-      gasSelection: $("#gasSelection").val(),
-      startDate: startDate,
-      endDate: endDate,
-      scale: $("#scale").val(),
-    };
-
-    $.ajax({
-      url: api_url + 'timeSeriesIndex',
-      type: "POST",
-      async: true,
-      crossDomain: true,
-      contentType: "application/json",
-      data: JSON.stringify(theJson)
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-      console.warn(jqXHR + textStatus + errorThrown);
-      $("#overlay").hide();
-    }).done(function(data, _textStatus, _jqXHR) {
-      if (data.errMsg) {
-        console.info(data.errMsg);
-      } else {
-        if (data.hasOwnProperty("timeseries")) {
-          // Update the chart with the new data
-          updateChart('timeSeriesIndex', data.timeseries);
-        } else {
-          console.warn("Wrong Data Returned");
-          console.log(data);
-        }
-      }
-      $("#overlay").hide()
-    });
-  }
-}
-
-
-
-
-
-
-
-
-
-function updateChart(chart, data) {
-  // Update the existing chart with new data
-  // Assuming you have a function to update the chart
-  updateChartData(chart, data);
-}
-
-==================================================================================
-*/
-  
-/*
-// this for the timeseries chart on the canvas 
-function getGasEmissions(lon, lat, startDate, endDate,gasType) {
-
-
-
-  const Sent5PNO2 = ee.ImageCollection("COPERNICUS/S5P/OFFL/L3_NO2")
-    .filterDate(startDate, endDate)
-    .select('NO2_column_number_density');
-
-  const point = ee.Geometry.Point(lon, lat);
-  const timeSeries = ee.ImageCollection(Sent5PNO2)
-    .filterBounds(point)
-    .map(function(image) {
-      return image.reduceRegion({
-        reducer: ee.Reducer.mean(),
-        geometry: point,
-        scale: 500,
-      });
-    }).flatten();
-
-  const emissions = timeSeries.aggregate_array('system:time_start').map(function(date) {
-    return [ee.Date(date).format('MM-yy'), timeSeries.filter(ee.Filter.dateRangeContains('system:time_start', date, date.advance(1, 'day'))).first().get('NO2_column_number_density')];
-  });
-
-  return emissions;
-}
-*/
-
 
 

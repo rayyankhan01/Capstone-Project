@@ -1,5 +1,6 @@
 import traceback
 
+import requests
 from flask import Flask, render_template
 from flask import request, jsonify
 from flask_cors import CORS
@@ -24,6 +25,7 @@ MOLAR_MASSES = {  # Molar masses in g/mol
 STANDARD_PRESSURE = 1013.25  # in hPa
 STANDARD_TEMPERATURE = 273.15  # in Kelvin
 
+
 def umol_per_m2_to_ppb(umol_per_m2, gas):
     """Converts concentration from µmol/m² to ppb."""
     # Using molar mass to convert µmol/m² to µg/m², then to ppb
@@ -31,16 +33,20 @@ def umol_per_m2_to_ppb(umol_per_m2, gas):
     ppb = micrograms_per_m2 / (MOLAR_VOLUME_AT_STP * 1e3)  # Convert µg/m³ to ppb
     return ppb
 
+
 def mol_per_m2_to_ppm(mol_per_m2, gas):
     """Converts concentration from mol/m² to ppm."""
     # Using molar mass to convert mol/m² to g/m², then to ppm
     grams_per_m2 = mol_per_m2 * MOLAR_MASSES[gas]
     ppm = grams_per_m2 / (MOLAR_VOLUME_AT_STP * 1e6)  # Convert g/m³ to ppm
     return ppm
+
+
 def get_date_range():
     today = datetime.now()
     last_week = today - timedelta(days=7)
     return last_week.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d')
+
 
 def calculate_aqi(Cp, breakpoints):
     for breakpoint in breakpoints:
@@ -49,14 +55,38 @@ def calculate_aqi(Cp, breakpoints):
             return ((AQI_high - AQI_low) / (C_high - C_low)) * (Cp - C_low) + AQI_low
     return
 
-breakpoints = { #(lower limit, upper limit, lower limit of quality, upper limit of quality). NO2, SO2 1 hour exposure in ppb, CO, O3 8hr exp ppm)
-    "O3" : [(0, 0.054,0,50),(0.055, 0.070, 51, 100),(0.071, 0.085, 101, 150),(0.086, 0.105, 151, 200), (0.106, 0.200, 201, 300)],
-    "NO2": [(0, 53, 0, 50), (54, 100, 51, 100), (101, 360, 101, 150), (361, 649, 151, 200),(650, 1249, 201, 300), (1250, 2049, 301, 500)],
-    "SO2": [(0, 35, 0, 50), (36,75,51,100),(76, 185, 101, 150), (186, 304, 151, 200), (305, 604, 201, 300), (605, 1004, 301, 500)],
-    "CO": [(0, 4.4, 0, 50), (4.5, 9.4, 51, 100), (9.5, 12.4, 101, 150), (12.5, 15.4, 151, 200), (15.5, 30.4, 201, 300), (30.5, 50.4, 301, 500)]
+
+breakpoints = {
+    # (lower limit, upper limit, lower limit of quality, upper limit of quality). NO2, SO2 1 hour exposure in ppb, CO, O3 8hr exp ppm)
+    "O3": [(0, 0.054, 0, 50), (0.055, 0.070, 51, 100), (0.071, 0.085, 101, 150), (0.086, 0.105, 151, 200),
+           (0.106, 0.200, 201, 300)],
+    "NO2": [(0, 53, 0, 50), (54, 100, 51, 100), (101, 360, 101, 150), (361, 649, 151, 200), (650, 1249, 201, 300),
+            (1250, 2049, 301, 500)],
+    "SO2": [(0, 35, 0, 50), (36, 75, 51, 100), (76, 185, 101, 150), (186, 304, 151, 200), (305, 604, 201, 300),
+            (605, 1004, 301, 500)],
+    "CO": [(0, 4.4, 0, 50), (4.5, 9.4, 51, 100), (9.5, 12.4, 101, 150), (12.5, 15.4, 151, 200), (15.5, 30.4, 201, 300),
+           (30.5, 50.4, 301, 500)],
+    "PM25": [(0, 12, 0, 50), (12.1, 35.4, 51, 100), (35.5, 55.4, 101, 150), (55.5, 150.4, 151, 200),
+             (150.5, 250.4, 201, 300), (250.5, 500.4, 301, 500)],
+    "PM10": [(0, 54, 0, 50), (55, 154, 51, 100), (155, 254, 101, 150), (255, 354, 151, 200), (355, 424, 201, 300),
+             (425, 604, 300, 500)]
 
 }
 
+
+@app.route('/api/openaq', methods=['GET'])
+def get_openaq_data():
+    latitude = request.args.get('lat')
+    longitude = request.args.get('lon')
+    date_from = request.args.get('date_from')
+    date_to = request.args.get('date_to')
+    limit = request.args.get('limit', 10000)
+
+    url = f"https://api.openaq.org/v2/measurements?coordinates={latitude},{longitude}&radius=1000&date_from={date_from}&date_to={date_to}&limit={limit}"
+    headers = {"X-API-Key": "64b0bb7bcecc37a2b4bee22f281748852e3055e3062d0d6fde9fce62977ff12b"}
+
+    response = requests.get(url, headers=headers)
+    return jsonify(response.json())
 
 
 @app.route('/gas-info', methods=['POST'])
@@ -68,12 +98,16 @@ def gas_info():
 
     point = ee.Geometry.Point([longitude, latitude])
     gases = {
-        "NO2": {"id": "COPERNICUS/S5P/NRTI/L3_NO2", "band": "NO2_column_number_density", "scale": 1e9, "unit": "µmol/m²"},
-        "SO2": {"id": "COPERNICUS/S5P/NRTI/L3_SO2", "band": "SO2_column_number_density", "scale": 1e9, "unit": "µmol/m²"},
+        "NO2": {"id": "COPERNICUS/S5P/NRTI/L3_NO2", "band": "NO2_column_number_density", "scale": 1e9,
+                "unit": "µmol/m²"},
+        "SO2": {"id": "COPERNICUS/S5P/NRTI/L3_SO2", "band": "SO2_column_number_density", "scale": 1e9,
+                "unit": "µmol/m²"},
         "CO": {"id": "COPERNICUS/S5P/NRTI/L3_CO", "band": "CO_column_number_density", "scale": 1e9, "unit": "mol/m²"},
         "O3": {"id": "COPERNICUS/S5P/NRTI/L3_O3", "band": "O3_column_number_density", "scale": 1e9, "unit": "µmol/m²"},
-        "CH4": {"id": "COPERNICUS/S5P/OFFL/L3_CH4", "band": "CH4_column_volume_mixing_ratio_dry_air", "scale": 1, "unit": "ppb"},
-        "HCHO": {"id": "COPERNICUS/S5P/NRTI/L3_HCHO", "band": "tropospheric_HCHO_column_number_density", "scale": 1e9, "unit": "mol/m²"}
+        "CH4": {"id": "COPERNICUS/S5P/OFFL/L3_CH4", "band": "CH4_column_volume_mixing_ratio_dry_air", "scale": 1,
+                "unit": "ppb"},
+        "HCHO": {"id": "COPERNICUS/S5P/NRTI/L3_HCHO", "band": "tropospheric_HCHO_column_number_density", "scale": 1e9,
+                 "unit": "mol/m²"}
     }
 
     response_data = {}
@@ -110,8 +144,6 @@ def index():
 def trends():
     return render_template('trends.html');
 
-from flask import Flask, jsonify
-import ee
 
 ee.Initialize()
 
@@ -134,8 +166,6 @@ def test():
         "CH4": "COPERNICUS/S5P/OFFL/L3_CH4",
     }
 
-    # Visualization parameters for each gas
-    # Note: These values are placeholders and should be fine-tuned for best results
     gas_viz_params = {
         "SO2": {'bands': ['SO2_column_number_density'], 'min': 0, 'max': 0.0005,
                 'palette': ['black', 'blue', 'purple', 'cyan', 'green', 'yellow', 'red']},
