@@ -145,8 +145,6 @@ def trends():
     return render_template('trends.html');
 
 
-ee.Initialize()
-
 
 @app.route('/test', methods=['POST'])
 def test():
