@@ -9,9 +9,11 @@ from flask import Flask, jsonify
 import ee
 from datetime import datetime, timedelta
 
+
 app = Flask(__name__)
 CORS(app)
 ee.Initialize()
+
 
 MOLAR_VOLUME_AT_STP = 22.414  # Molar volume of gas at STP in liters
 MOLAR_MASSES = {  # Molar masses in g/mol
@@ -131,6 +133,8 @@ def gas_info():
     return jsonify(response_data)
 
 
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -196,6 +200,81 @@ def test():
 
     url = image_to_map_id(collection, band_viz)
     return jsonify(url), 200
+
+
+#Dictionary for gasses and their respective collections and bands
+gas_mapping = {
+    "SO2": {
+        'collection_name': "COPERNICUS/S5P/NRTI/L3_SO2",
+        'index_name': 'SO2_column_number_density'
+    },
+    "NO2": {
+        'collection_name': "COPERNICUS/S5P/NRTI/L3_NO2",
+        'index_name': 'NO2_column_number_density'
+    },
+    "CO": {
+        'collection_name': "COPERNICUS/S5P/NRTI/L3_CO",
+        'index_name': 'CO_column_number_density'
+    },
+
+    "HCHO": {
+        'collection_name': "COPERNICUS/S5P/NRTI/L3_HCHO",
+        'index_name':'tropospheric_HCHO_column_number_density'
+    },
+     "O3": {
+        'collection_name': "COPERNICUS/S5P/NRTI/L3_O3",
+        'index_name': 'O3_column_number_density'
+    },
+     "CH4": {
+        'collection_name': "COPERNICUS/S5P/OFFL/L3_CH4",
+        'index_name': 'CH4_column_volume_mixing_ratio_dry_air'
+    },
+}
+
+#collection to filter the data
+countries = ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
+uae = countries.filter(ee.Filter.eq('country_na', 'United Arab Emirates'))
+uae_boundaries = uae.first().geometry()
+
+preset_reducer = 'mean' # reducer for the data
+preset_scale = 30
+
+
+@app.route('/timeSeriesIndex', methods=['POST'])
+def time_series_index():
+    try:
+        raw_data = request.data  # This will capture raw bytes sent to the endpoint
+        print("Raw data received:", raw_data)
+
+        request_json = request.get_json()
+        print('Received JSON:', request_json)
+
+        if request_json:
+            gas_selection = request_json.get('gas', None)
+            start_date = request_json.get('startDate', None)
+            end_date = request_json.get('endDate', None)
+
+            # Get the collection name and index name based on the gas selection
+            gas_info = gas_mapping.get(gas_selection, None)
+
+            if gas_info and start_date and end_date:
+                values = get_time_series_by_collection_and_index(gas_info['collection_name'],
+                                                                  gas_info['index_name'],
+                                                                  preset_scale,
+                                                                  uae_boundaries,
+                                                                  start_date,
+                                                                  end_date,
+                                                                  preset_reducer)
+            else:
+                raise Exception("Missing required parameters")
+        else:
+            raise Exception("Invalid request payload")
+    except Exception as e:
+        values = {
+            'errMsg': str(e)
+        }
+
+    return jsonify(values), 200
 
 
 if __name__ == '__main__':
