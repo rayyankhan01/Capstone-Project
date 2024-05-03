@@ -5,28 +5,30 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Trends</title>
     <style>
-
         body {
             background-image: url('/static/imgs/background.jpg');
-            background-size: cover; /* Cover the entire page */
-            background-position: center; /* Center the image */
-            background-attachment: fixed; /* Fixed background */
-            background-repeat: no-repeat; /* Do not repeat the image */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
         }
-        /* Add some space around the images and a fixed height for descriptions */
         .image-container {
             padding: 10px;
         }
         .image-description {
-            height: 50px; /* Adjust height as needed for your descriptions */
-            overflow: hidden; /* Ensures the content fits into the allocated space */
-            text-overflow: ellipsis; /* Adds an ellipsis if the text is too long */
-            white-space: nowrap; /* Keeps the text on a single line */
+            height: 50px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .img-fluid {
+            max-height: 400px; /* Adjust height to maintain quality */
+            width: auto;
+            max-width: 100%; /* Ensure images resize within their containers */
         }
     </style>
 </head>
 <body>
-<!-- Navigation bar -->
 <nav class="navbar border-bottom border-body" style="background-color: #e3f2fd;">
     <div class="container-fluid">
         <a class="navbar-brand mb-0 h1" href="/">GasMaps@UAE</a>
@@ -45,100 +47,42 @@
 </nav>
 <div class="container mt-3">
     <div class="row">
-        <!-- CH4 Column -->
-        <div class="col-md-2">
+        <!-- Adjusting columns to fit two images per row on medium and larger screens -->
+        <div class="col-sm-6 col-md-6 col-lg-6">
             <div class="image-container">
-                <img src="/static/imgs/UAE_CH4_Concentration_Covid.tif.jpg" class="img-fluid" alt="CH4 Concentration Covid">
-                <p class="image-description">CH4 Concentration Covid</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_CH4_Concentration_Post_Covid.tif.jpg" class="img-fluid" alt="CH4 Concentration Post Covid">
-                <p class="image-description">CH4 Concentration Post Covid</p>
+                <img src="/static/imgs/Methane.jpg" class="img-fluid" alt="Methane Concentration">
             </div>
         </div>
+        <div class="col-sm-6 col-md-6 col-lg-6">
+            <div class="image-container">
+                <img src="/static/imgs/Carbon Monoxide.jpeg" class="img-fluid" alt="Carbon Monoxide Concentration">
 
-        <!-- CO Column -->
-        <div class="col-md-2">
-            <div class="image-container">
-                <img src="/static/imgs/UAE_CO_Concentration_Covid.tif.jpg" class="img-fluid" alt="CO Concentration Covid">
-                <p class="image-description">CO Concentration Covid</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_CO_Concentration_Post_Covid.tif.jpg" class="img-fluid" alt="CO Concentration Post Covid">
-                <p class="image-description">CO Concentration Post Covid</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_CO_Concentration_Winter.tif.jpg" class="img-fluid" alt="CO Concentration Winter">
-                <p class="image-description">CO Concentration Winter</p>
             </div>
         </div>
+        <div class="col-sm-6 col-md-6 col-lg-6">
+            <div class="image-container">
+                <img src="/static/imgs/Formaldehyde.jpg" class="img-fluid" alt="Formaldehyde Concentration">
 
-        <!-- HCHO Column -->
-        <div class="col-md-2">
-            <div class="image-container">
-                <img src="/static/imgs/UAE_HCHO_Concentration_Covid.tif.jpg" class="img-fluid" alt="HCHO Concentration Covid">
-                <p class="image-description">HCHO Concentration Covid</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_HCHO_Concentration_Post_Covid.tif.jpg" class="img-fluid" alt="HCHO Concentration Post Covid">
-                <p class="image-description">HCHO Concentration Post Covid</p>
             </div>
         </div>
+        <div class="col-sm-6 col-md-6 col-lg-6">
+            <div class="image-container">
+                <img src="/static/imgs/Nitrogen.jpg" class="img-fluid" alt="Nitrogen Oxide Concentration">
 
-        <!-- NO2 Column -->
-        <div class="col-md-2">
-            <div class="image-container">
-                <img src="/static/imgs/UAE_NO2_Concentration_Covid.tif.jpg" class="img-fluid" alt="NO2 Concentration Covid">
-                <p class="image-description">NO2 Concentration Covid</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_NO2_Concentration_Post_Covid.tif.jpg" class="img-fluid" alt="NO2 Concentration Post Covid">
-                <p class="image-description">NO2 Concentration Post Covid</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_NO2_Concentration_Summer.tif.jpg" class="img-fluid" alt="NO2 Concentration Summer">
-                <p class="image-description">NO2 Concentration Summer</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_NO2_Concentration_Winter.tif.jpg" class="img-fluid" alt="NO2 Concentration Winter">
-                <p class="image-description">NO2 Concentration Winter</p>
             </div>
         </div>
-
-        <!-- O3 Column -->
-        <div class="col-md-2">
+        <div class="col-sm-6 col-md-6 col-lg-6">
             <div class="image-container">
-                <img src="/static/imgs/UAE_O3_Concentration_Covid.tif.jpg" class="img-fluid" alt="O3 Concentration Covid">
-                <p class="image-description">O3 Concentration Covid</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_O3_Concentration_Post_Covid.tif.jpg" class="img-fluid" alt="O3 Concentration Post Covid">
-                <p class="image-description">O3 Concentration Post Covid</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_O3_Concentration_Summer.tif.jpg" class="img-fluid" alt="O3 Concentration Summer">
-                <p class="image-description">O3 Concentration Summer</p>
+                <img src="/static/imgs/Ozone.jpg" class="img-fluid" alt="Ozone Concentration">
             </div>
         </div>
-
-        <!-- SO2 Column -->
-        <div class="col-md-2">
+        <div class="col-sm-6 col-md-6 col-lg-6">
             <div class="image-container">
-                <img src="/static/imgs/UAE_SO2_Concentration_Covid.tif.jpg" class="img-fluid" alt="SO2 Concentration Covid">
-                <p class="image-description">SO2 Concentration Covid</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_SO2_Concentration_Post_Covid.tif.jpg" class="img-fluid" alt="SO2 Concentration Post Covid">
-                <p class="image-description">SO2 Concentration Post Covid</p>
-            </div>
-            <div class="image-container">
-                <img src="/static/imgs/UAE_SO2_Concentration_Winter.jpg" class="img-fluid" alt="SO2 Concentration Winter">
-                <p class="image-description">SO2 Concentration Winter</p>
+                <img src="/static/imgs/Sulfur.jpg" class="img-fluid" alt="Sulfur Dioxide Concentration">
             </div>
         </div>
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
