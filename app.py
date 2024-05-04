@@ -6,6 +6,8 @@ import requests
 from flask import Flask, render_template
 from flask import request, jsonify
 from flask_cors import CORS
+from google.oauth2 import service_account
+
 from ee_utils import *
 from flask import Flask, jsonify
 import ee
@@ -17,7 +19,8 @@ def initialize_earth_engine():
     ee_credentials = os.getenv('EE_CREDENTIALS_JSON')
     if ee_credentials:
         credentials_dict = json.loads(ee_credentials)
-        ee.Initialize(credentials=ee.ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict))
+        credentials = service_account.Credentials.from_service_account_info(credentials_dict)
+        ee.Initialize(credentials)
     else:
         raise ValueError("Failed to get Earth Engine credentials from environment variable")
 
