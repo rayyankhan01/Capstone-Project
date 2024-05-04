@@ -16,13 +16,19 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 CORS(app)
 def initialize_earth_engine():
-    ee_credentials = os.getenv('EE_CREDENTIALS_JSON')
-    if ee_credentials:
-        credentials_dict = json.loads(ee_credentials)
-        credentials = service_account.Credentials.from_service_account_info(credentials_dict)
+    # Fetch the Earth Engine credentials from an environment variable
+    ee_credentials_json = os.getenv('EE_CREDENTIALS_JSON')
+    if ee_credentials_json:
+        credentials_dict = json.loads(ee_credentials_json)
+        # Create credentials using the proper Earth Engine scope
+        credentials = service_account.Credentials.from_service_account_info(
+            credentials_dict,
+            scopes=['https://www.googleapis.com/auth/earthengine']
+        )
         ee.Initialize(credentials)
     else:
         raise ValueError("Failed to get Earth Engine credentials from environment variable")
+
 
 initialize_earth_engine()
 
