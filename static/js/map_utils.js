@@ -4,9 +4,14 @@ if (window.location.hostname === "localhost" || window.location.hostname === "12
     api_url = "http://127.0.0.1:5000/";
 } else {
     // Azure web service
-    api_url = "https://gasmaps.azurewebsites.net";
+    api_url = "https://gasmaps.azurewebsites.net/";
 
 }
+
+function joinUrl(base, path) {
+    return `${base.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
+}
+
 
 
 function loadMap(target, center, zoom) {
