@@ -1,3 +1,4 @@
+import json
 import os
 import traceback
 
@@ -12,7 +13,15 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 CORS(app)
-ee.Initialize()
+def initialize_earth_engine():
+    ee_credentials = os.getenv('EE_CREDENTIALS_JSON')
+    if ee_credentials:
+        credentials_dict = json.loads(ee_credentials)
+        ee.Initialize(credentials=ee.ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict))
+    else:
+        raise ValueError("Failed to get Earth Engine credentials from environment variable")
+
+initialize_earth_engine()
 
 MOLAR_VOLUME_AT_STP = 22.414  # Molar volume of gas at STP in liters
 MOLAR_MASSES = {  # Molar masses in g/mol
