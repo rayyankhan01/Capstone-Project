@@ -3,6 +3,7 @@ import os
 import traceback
 
 import requests
+from celery import Celery
 from flask import Flask, render_template
 from flask import request, jsonify
 from flask_cors import CORS
@@ -17,8 +18,35 @@ app = Flask(__name__)
 CORS(app)
 
 
+# Initialize Celery
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        backend=app.config['CELERY_RESULT_BACKEND'],
+        broker=app.config['CELERY_BROKER_URL']
+    )
+    celery.conf.update(app.config)
+
+    class ContextTask(celery.Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
+
+
+# Configuration for Celery
+app.config.update(
+    CELERY_BROKER_URL='redis://localhost:6379/0',
+    CELERY_RESULT_BACKEND='redis://localhost:6379/0'
+)
+
+celery = make_celery(app)
+
+
 def initialize_earth_engine():
-    print("Current FLASK_ENV:", os.getenv('FLASK_DEBUG'))  # This should print 'development' if correctly set
+    print("Current FLASK_ENV:", os.getenv('FLASK_DEBUG'))
     if os.getenv('FLASK_DEBUG') == "1":
         print("Authenticating for local development...")
         ee.Authenticate()
@@ -39,63 +67,11 @@ def initialize_earth_engine():
 
 initialize_earth_engine()
 
-MOLAR_VOLUME_AT_STP = 22.414  # Molar volume of gas at STP in liters
-MOLAR_MASSES = {  # Molar masses in g/mol
-    "NO2": 46.0055,
-    "SO2": 64.066,
-    "O3": 48.00,
-    "CO": 28.01,
-}
-STANDARD_PRESSURE = 1013.25  # in hPa
-STANDARD_TEMPERATURE = 273.15  # in Kelvin
-
-
-def umol_per_m2_to_ppb(umol_per_m2, gas):
-    """Converts concentration from µmol/m² to ppb."""
-    # Using molar mass to convert µmol/m² to µg/m², then to ppb
-    micrograms_per_m2 = umol_per_m2 * MOLAR_MASSES[gas]
-    ppb = micrograms_per_m2 / (MOLAR_VOLUME_AT_STP * 1e3)  # Convert µg/m³ to ppb
-    return ppb
-
-
-def mol_per_m2_to_ppm(mol_per_m2, gas):
-    """Converts concentration from mol/m² to ppm."""
-    # Using molar mass to convert mol/m² to g/m², then to ppm
-    grams_per_m2 = mol_per_m2 * MOLAR_MASSES[gas]
-    ppm = grams_per_m2 / (MOLAR_VOLUME_AT_STP * 1e6)  # Convert g/m³ to ppm
-    return ppm
-
 
 def get_date_range():
     today = datetime.now()
     last_week = today - timedelta(days=7)
     return last_week.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d')
-
-
-def calculate_aqi(Cp, breakpoints):
-    for breakpoint in breakpoints:
-        C_low, C_high, AQI_low, AQI_high = breakpoint
-        if C_low <= Cp <= C_high:
-            return ((AQI_high - AQI_low) / (C_high - C_low)) * (Cp - C_low) + AQI_low
-    return
-
-
-breakpoints = {
-    # (lower limit, upper limit, lower limit of quality, upper limit of quality). NO2, SO2 1 hour exposure in ppb, CO, O3 8hr exp ppm)
-    "O3": [(0, 0.054, 0, 50), (0.055, 0.070, 51, 100), (0.071, 0.085, 101, 150), (0.086, 0.105, 151, 200),
-           (0.106, 0.200, 201, 300)],
-    "NO2": [(0, 53, 0, 50), (54, 100, 51, 100), (101, 360, 101, 150), (361, 649, 151, 200), (650, 1249, 201, 300),
-            (1250, 2049, 301, 500)],
-    "SO2": [(0, 35, 0, 50), (36, 75, 51, 100), (76, 185, 101, 150), (186, 304, 151, 200), (305, 604, 201, 300),
-            (605, 1004, 301, 500)],
-    "CO": [(0, 4.4, 0, 50), (4.5, 9.4, 51, 100), (9.5, 12.4, 101, 150), (12.5, 15.4, 151, 200), (15.5, 30.4, 201, 300),
-           (30.5, 50.4, 301, 500)],
-    "PM25": [(0, 12, 0, 50), (12.1, 35.4, 51, 100), (35.5, 55.4, 101, 150), (55.5, 150.4, 151, 200),
-             (150.5, 250.4, 201, 300), (250.5, 500.4, 301, 500)],
-    "PM10": [(0, 54, 0, 50), (55, 154, 51, 100), (155, 254, 101, 150), (255, 354, 151, 200), (355, 424, 201, 300),
-             (425, 604, 300, 500)]
-
-}
 
 
 @app.route('/api/openaq', methods=['GET'])
@@ -260,6 +236,7 @@ preset_scale = 30
 
 
 @app.route('/timeSeriesIndex', methods=['POST'])
+@celery.task
 def time_series_index():
     try:
         raw_data = request.data  # This will capture raw bytes sent to the endpoint

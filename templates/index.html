@@ -73,7 +73,6 @@
           </div>
       </li>
       <li class="nav-item me-3">
-        <a class="nav-link disabled" aria-disabled="true">Disabled</a>
       </li>
     </ul>
 
@@ -90,10 +89,6 @@
           </div>
           <div class="offcanvas-body">
             <p>Click on the map to see gas emissions at that point.</p>
-            <div id="coordinatesInfo">
-              <strong>Latitude:</strong> <span id="latitudeValue"></span>, 
-              <strong>Longitude:</strong> <span id="longitudeValue"></span>
-            </div>
             <div id="gasEmissionsInfo">
               <ul class="list-unstyled">
                 <li><strong>CH4:</strong> <span id="ch4Value">Loading...</span></li>
@@ -151,21 +146,7 @@
 <!-- Bootstrap script -->
 
 <script>
-/*
-  $(document).ready(function() {
-    var today = new Date();
-    var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
 
-    $("#start-date").datepicker({
-        dateFormat: "yy-mm-dd",
-        defaultDate: lastWeek
-    });
-    $("#end-date").datepicker({
-        dateFormat: "yy-mm-dd",
-        defaultDate: today
-    });
-});
-*/
 $(document).ready(function() {
     var today = new Date();
     var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);

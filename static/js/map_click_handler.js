@@ -13,7 +13,7 @@ const MOLAR_MASSES = {
     "so2": 64.066,  // g/mol
     "co": 28.01,    // g/mol
     "o3": 48.00,    // g/mol
-    // Add molar masses for other gases if needed
+
 };
 
 // This function converts concentrations from µg/m³ to ppm or ppb
@@ -153,11 +153,6 @@ function fetchOpenAQData(lat, lon) {
     document.getElementById('latitudeValue').textContent = lat.toFixed(3);
     document.getElementById('longitudeValue').textContent = lon.toFixed(3);
 
-    // Object.keys(data).forEach(gas => {
-    //     gasInfoElement.innerHTML += `<p><strong>${gas}:</strong> ${data[gas]}</p>`;
-    // });
-
-    // You can update the contents of the elements like this
     document.getElementById('ch4Value').textContent = data['CH4'];
     document.getElementById('coValue').textContent = data['CO'];
     document.getElementById('hchoValue').textContent = data['HCHO'];
