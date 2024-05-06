@@ -3,7 +3,6 @@ import os
 import traceback
 
 import requests
-from celery import Celery
 from flask import Flask, render_template
 from flask import request, jsonify
 from flask_cors import CORS
@@ -18,35 +17,8 @@ app = Flask(__name__)
 CORS(app)
 
 
-# Initialize Celery
-def make_celery(app):
-    celery = Celery(
-        app.import_name,
-        backend=app.config['CELERY_RESULT_BACKEND'],
-        broker=app.config['CELERY_BROKER_URL']
-    )
-    celery.conf.update(app.config)
-
-    class ContextTask(celery.Task):
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery.Task = ContextTask
-    return celery
-
-
-# Configuration for Celery
-app.config.update(
-    CELERY_BROKER_URL='redis://localhost:6379/0',
-    CELERY_RESULT_BACKEND='redis://localhost:6379/0'
-)
-
-celery = make_celery(app)
-
-
 def initialize_earth_engine():
-    print("Current FLASK_ENV:", os.getenv('FLASK_DEBUG'))
+    print("Current FLASK_ENV:", os.getenv('FLASK_DEBUG'))  # This should print 'development' if correctly set
     if os.getenv('FLASK_DEBUG') == "1":
         print("Authenticating for local development...")
         ee.Authenticate()
@@ -140,7 +112,17 @@ def index():
 
 @app.route('/trends')
 def trends():
-    return render_template('trends.html');
+    return render_template('trends.html')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
+@app.route('/charts')
+def charts():
+    return render_template('charts.html')
 
 
 @app.route('/test', methods=['POST'])
@@ -236,7 +218,6 @@ preset_scale = 30
 
 
 @app.route('/timeSeriesIndex', methods=['POST'])
-@celery.task
 def time_series_index():
     try:
         raw_data = request.data  # This will capture raw bytes sent to the endpoint

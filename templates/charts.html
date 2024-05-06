@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>Trends</title>
+    <title>Charts</title>
     <style>
         body {
             background-image: url('/static/imgs/background.jpg');
@@ -13,18 +13,17 @@
             background-repeat: no-repeat;
         }
         .image-container {
-            padding: 10px;
-        }
-        .image-description {
-            height: 50px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            padding: 20px;
+            background-color: #fff; /* White background to create padding effect */
+            border: 2px solid black; /* Black border around the image */
+            margin: 10px; /* Space between images */
         }
         .img-fluid {
-            max-height: 400px; /* Adjust height to maintain quality */
-            width: auto;
+            height: 420px; /* Set a fixed height for uniformity */
+            width: auto; /* Maintain aspect ratio */
             max-width: 100%; /* Ensure images resize within their containers */
+            display: block; /* Remove bottom space/gap */
+            margin: auto; /* Center align the image */
         }
     </style>
 </head>
@@ -34,55 +33,50 @@
         <a class="navbar-brand mb-0 h1" href="/">GasMaps@UAE</a>
         <ul class="nav justify-content-center">
             <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/">Home</a>
+                <a class="nav-link" href="/">Home</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/about">About</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/trends">Trends</a>
+                <a class="nav-link active" aria-current="page" href="/charts">Charts</a>
             </li>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/charts">Charts</a>
-            </li>
+                      <li class="nav-item">
+                  <a class="nav-link" href="/trends">Trends</a>
+                </li>
         </ul>
     </div>
 </nav>
 <div class="container mt-3">
     <div class="row">
-        <!-- Adjusting columns to fit two images per row on medium and larger screens -->
-        <div class="col-sm-6 col-md-6 col-lg-6">
+        <div class="col-md-6">
             <div class="image-container">
-                <img src="/static/imgs/Methane.jpg" class="img-fluid" alt="Methane Concentration">
+                <img src="/static/imgs/CH4Monthly.png" class="img-fluid" alt="Monthly Methane">
             </div>
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-6">
+        <div class="col-md-6">
             <div class="image-container">
-                <img src="/static/imgs/Carbon Monoxide.jpeg" class="img-fluid" alt="Carbon Monoxide Concentration">
-
+                <img src="/static/imgs/CO2023.png" class="img-fluid" alt="Carbon Monoxide 2023">
             </div>
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-6">
+        <div class="col-md-6">
             <div class="image-container">
-                <img src="/static/imgs/Formaldehyde.jpg" class="img-fluid" alt="Formaldehyde Concentration">
-
+                <img src="/static/imgs/FormaldehdyeAvg.png" class="img-fluid" alt="Average Formaldehyde">
             </div>
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-6">
+        <div class="col-md-6">
             <div class="image-container">
-                <img src="/static/imgs/Nitrogen.jpg" class="img-fluid" alt="Nitrogen Oxide Concentration">
-
+                <img src="/static/imgs/NO2avg2023.png" class="img-fluid" alt="Nitrogen Dioxide Average 2023">
             </div>
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-6">
+        <div class="col-md-6">
             <div class="image-container">
-                <img src="/static/imgs/Ozone.jpg" class="img-fluid" alt="Ozone Concentration">
+                <img src="/static/imgs/OzoneMonthly.png" class="img-fluid" alt="Monthly Ozone">
             </div>
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-6">
+        <div class="col-md-6">
             <div class="image-container">
-                <img src="/static/imgs/Sulfur.jpg" class="img-fluid" alt="Sulfur Dioxide Concentration">
+                <img src="/static/imgs/So2newAvg.png" class="img-fluid" alt="New Sulfur Dioxide Average">
             </div>
         </div>
     </div>
