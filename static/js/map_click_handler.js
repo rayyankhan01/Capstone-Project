@@ -16,6 +16,73 @@ const MOLAR_MASSES = {
 
 };
 
+function getHealthRecommendation(aqi, gas) {
+    const recommendations = {
+        "o3": {
+            "0-50": "None",
+            "51-100": "Unusually sensitive people should consider reducing prolonged or heavy outdoor exertion.",
+            "101-150": "People with lung disease, children, and older adults should reduce prolonged outdoor exertion.",
+            "151-200": "Everyone should avoid prolonged or heavy exertion.",
+            "201-300": "Everyone should avoid all physical activity outdoors.",
+            "301-500": "Everyone should avoid all outdoor exertion"
+        },
+        "no2": {
+            "0-50": "None",
+            "51-100": "Unusually sensitive individuals should consider limiting prolonged exertion especially near busy roads.",
+            "101-150": "People with asthma, children and older adults should limit prolonged exertion.",
+            "151-200": "Everyone should avoid prolonged exertion especially near busy roads.",
+            "201-300": "Everyone should avoid all outdoor exertion.",
+            "301-500": "People with asthma, children, and older adults should remain indoors; everyone else should avoid outdoor exertion"
+        },
+        "so2": {
+            "0-50": "None",
+            "51-100": "Unusually sensitive individuals should consider limiting prolonged exertion.",
+            "101-150": "People with asthma should consider limiting outdoor exertion.",
+            "151-200": "Everyone should avoid prolonged or heavy exertion.",
+            "201-300": "Everyone should avoid all physical activity outdoors.",
+            "301-500": "Children, people with asthma, or other lung issues should remain indoors; everyone else should avoid outdoor exertion"
+        },
+        "co": {
+            "0-50": "None",
+            "51-100": "People with heart disease, such as angina, should limit moderate exertion and avoid sources of CO.",
+            "101-150": "People with heart disease should avoid exertion and sources of CO.",
+            "151-200": "Everyone should avoid all physical activity outdoors.",
+            "201-300": "Everyone should avoid all outdoor exertion.",
+            "301-500": "People with heart disease, such as angina, should avoid exertion and sources of CO such as heavy traffic; everyone else should limit heavy exertion"
+        },
+        "pm25":{
+            "0-50": "None",
+            "51-100": "Unusually sensitive people should consider reducing prolonged or heavy exertion. ",
+            "101-150": "People with heart or lung disease, older adults, children, should reduce prolonged exertion",
+            "151-200": "Everyone should reduce prolonged or heavy exertion",
+            "201-300": "People with heart or lung disease, older adults, and children should avoid all physical activity outdoors. Everyone else should avoid prolonged or heavy exertion. ",
+            "301-500": "Everyone should avoid all physical activity outdoors; people with heart or lung disease, older adults, and children should remain indoors and keep activity levels low. ",
+
+        },
+        "pm10":{
+            "0-50": "None",
+            "51-100": "Unusually sensitive people should consider reducing prolonged or heavy exertion.",
+            "101-150": "People with heart or lung disease, older adults, children, should reduce prolonged exertion",
+            "151-200": "Everyone should reduce prolonged or heavy exertion",
+            "201-300": "People with heart or lung disease, older adults, and children should avoid all physical activity outdoors. Everyone else should avoid prolonged or heavy exertion. ",
+            "301-500": "Everyone should avoid all physical activity outdoors; people with heart or lung disease, older adults, and children should remain indoors and keep activity levels low. ",
+
+        }
+
+    };
+
+    let range = "";
+    if (aqi <= 50) range = "0-50";
+    else if (aqi <= 100) range = "51-100";
+    else if (aqi <= 150) range = "101-150";
+    else if (aqi <= 200) range = "151-200";
+    else if (aqi <= 300) range = "201-300";
+    else if (aqi <= 500) range = "301-500"
+
+    return recommendations[gas][range] || "No recommendation available.";
+}
+
+
 // This function converts concentrations from µg/m³ to ppm or ppb
 function convertToAppropriateUnit(value, parameter) {
     const molarVolume = 24.45; // Molar Volume at 25°C and 1 atm in Liters
@@ -198,5 +265,9 @@ function displayOpenAQData(averages, mostPollutingGas) {
         const highlightStyle = (param === mostPollutingGas) ? "color: red;" : "";
         gasInfoElement.innerHTML += `<p style="${highlightStyle}"><strong>${param.toUpperCase()}:</strong> ${average.toFixed(2)} ${unit}, AQI: ${Math.round(aqi)}</p>`;
     }
+    // Add separation and health recommendation title
+    const healthRecommendation = getHealthRecommendation(averages[mostPollutingGas].aqi, mostPollutingGas);
+    gasInfoElement.innerHTML += "-----------------------------------------<h3>Health Recommendation:</h3>";
+    gasInfoElement.innerHTML += `<p>${healthRecommendation}</p>`;
     new bootstrap.Offcanvas(document.getElementById('gasInfoOffcanvas')).show();
 }

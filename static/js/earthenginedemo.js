@@ -1,6 +1,4 @@
 let currentLayer;
-let currentChart;
-let bandCollector;
 
 $(function () {
   // Initial map load
